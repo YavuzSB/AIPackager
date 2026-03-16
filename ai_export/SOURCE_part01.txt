@@ -1,0 +1,3839 @@
+==== FILE: INDEX.txt ====
+# INDEX
+
+Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
+
+## Summary
+- Included files: 18
+- Skipped items: 1
+- Total included bytes: 118375
+
+## Included Files (Tree-like)
+  - .github/copilot-instructions.md (2346 B)
+- CMakeLists.txt (248 B)
+  - ai_export/INDEX.txt (434 B)
+  - ai_export/SOURCE_part01.txt (56044 B)
+  - cli/CMakeLists.txt (354 B)
+    - cli/src/main.cpp (5363 B)
+  - core/CMakeLists.txt (460 B)
+      - core/include/core/ChunkManager.hpp (2136 B)
+      - core/include/core/IndexBuilder.hpp (1450 B)
+      - core/include/core/Packager.hpp (2848 B)
+      - core/include/core/Scanner.hpp (3803 B)
+    - core/src/ChunkManager.cpp (2857 B)
+    - core/src/IndexBuilder.cpp (4308 B)
+    - core/src/Packager.cpp (4357 B)
+    - core/src/Scanner.cpp (12967 B)
+  - gui/CMakeLists.txt (1542 B)
+    - gui/src/main.cpp (14363 B)
+- izli_export.py (2495 B)
+
+## Skipped Items
+- build | reason=ExcludedDirectory | details=Directory excluded by scanner options
+
+==== END FILE: INDEX.txt ====
+
+==== FILE: .github/copilot-instructions.md ====
+AIPackager/
+├── CMakeLists.txt              # Ana orkestratör (Tüm projeyi ve hedefleri yönetir)
+├── core/                       # İş Mantığı (CLI ve GUI buraya bağımlıdır)
+│   ├── CMakeLists.txt          # Core için statik kütüphane (static library) üretir
+│   ├── include/core/
+│   │   ├── Packager.hpp        # 400KB'lık bölme ve birleştirme mantığı
+│   │   └── Scanner.hpp         # Dosya tarama ve filtreleme (.gitignore mantığı)
+│   └── src/
+│       ├── Packager.cpp
+│       └── Scanner.cpp
+├── cli/                        # Terminal Sürümü
+│   ├── CMakeLists.txt          # 'aipackager-cli' çalıştırılabilir dosyasını üretir
+│   └── src/main.cpp            # Sadece argümanları ayrıştırır ve Core'u çağırır
+└── gui/                        # Masaüstü Sürümü
+    ├── CMakeLists.txt          # 'aipackager-gui' çalıştırılabilir dosyasını üretir (ImGui + GLFW)
+    └── src/main.cpp            # Pencereyi çizer, sürükle-bırak eventlerini Core'a iletir
+
+
+
+Sen kıdemli bir C++ (C++20) yazılım mimarısın. Amacımız, projeleri AI asistanları için 400KB'lık metin parçalarına bölen bir aracın sadece Core (Çekirdek) kütüphanesini yazmak. Arayüz (GUI) veya CLI kodu YAZMAYACAKSIN.
+
+Kurallar ve Standartlar:
+
+Sadece Modern C++20 kullanılacak. Dosya işlemleri için std::filesystem zorunludur.
+
+RAII prensiplerine sıkı sıkıya uyulacak, raw pointer kullanılmayacak.
+
+Çıktı olarak verilen kodlar core/include/core/ ve core/src/ dizin yapısına uygun olarak ayrılmalıdır.
+
+Geliştirilecek Sınıflar:
+
+Scanner: Verilen kök dizini tarayacak. .git, build, node_modules gibi klasörleri ve .exe, .dll, .png gibi binary dosyaları es geçecek gelişmiş bir filtreleme yapısına sahip olmalı.
+
+Packager: Scanner'dan gelen dosya yollarını okuyacak. Her dosyanın başına ve sonuna ayırıcı başlıklar (örn: ==== FILE: src/main.cpp ====) ekleyecek.
+
+ChunkManager: Packager'ın ürettiği veriyi bellek dostu bir şekilde tam olarak 400 KB sınırını aşmayacak parçalara (chunk) bölecek ve bellekte tutacak.
+
+IndexBuilder: Taranan tüm dosyaların ve atlanan dosyaların ağaç yapısını barındıran bir INDEX.txt içeriği oluşturacak.
+==== END FILE: .github/copilot-instructions.md ====
+
+==== FILE: CMakeLists.txt ====
+cmake_minimum_required(VERSION 3.20)
+
+project(AIPackager VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_subdirectory(core)
+add_subdirectory(cli)
+add_subdirectory(gui)
+
+==== END FILE: CMakeLists.txt ====
+
+==== FILE: ai_export/INDEX.txt ====
+=== PROJE DOSYA AĞACI VE İNDEKS ===
+
+- CMakeLists.txt
+- .github/copilot-instructions.md
+- core/CMakeLists.txt
+- core/include/core/Scanner.hpp
+- core/include/core/ChunkManager.hpp
+- core/include/core/IndexBuilder.hpp
+- core/include/core/Packager.hpp
+- core/src/ChunkManager.cpp
+- core/src/Scanner.cpp
+- core/src/IndexBuilder.cpp
+- core/src/Packager.cpp
+- cli/CMakeLists.txt
+- cli/src/main.cpp
+- gui/CMakeLists.txt
+- gui/src/main.cpp
+
+==== END FILE: ai_export/INDEX.txt ====
+
+==== FILE: ai_export/SOURCE_part01.txt ====
+
+============================================================
+FILE: CMakeLists.txt
+============================================================
+cmake_minimum_required(VERSION 3.20)
+
+project(AIPackager VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_subdirectory(core)
+add_subdirectory(cli)
+add_subdirectory(gui)
+
+
+============================================================
+FILE: .github/copilot-instructions.md
+============================================================
+AIPackager/
+├── CMakeLists.txt              # Ana orkestratör (Tüm projeyi ve hedefleri yönetir)
+├── core/                       # İş Mantığı (CLI ve GUI buraya bağımlıdır)
+│   ├── CMakeLists.txt          # Core için statik kütüphane (static library) üretir
+│   ├── include/core/
+│   │   ├── Packager.hpp        # 400KB'lık bölme ve birleştirme mantığı
+│   │   └── Scanner.hpp         # Dosya tarama ve filtreleme (.gitignore mantığı)
+│   └── src/
+│       ├── Packager.cpp
+│       └── Scanner.cpp
+├── cli/                        # Terminal Sürümü
+│   ├── CMakeLists.txt          # 'aipackager-cli' çalıştırılabilir dosyasını üretir
+│   └── src/main.cpp            # Sadece argümanları ayrıştırır ve Core'u çağırır
+└── gui/                        # Masaüstü Sürümü
+    ├── CMakeLists.txt          # 'aipackager-gui' çalıştırılabilir dosyasını üretir (ImGui + GLFW)
+    └── src/main.cpp            # Pencereyi çizer, sürükle-bırak eventlerini Core'a iletir
+
+
+
+Sen kıdemli bir C++ (C++20) yazılım mimarısın. Amacımız, projeleri AI asistanları için 400KB'lık metin parçalarına bölen bir aracın sadece Core (Çekirdek) kütüphanesini yazmak. Arayüz (GUI) veya CLI kodu YAZMAYACAKSIN.
+
+Kurallar ve Standartlar:
+
+Sadece Modern C++20 kullanılacak. Dosya işlemleri için std::filesystem zorunludur.
+
+RAII prensiplerine sıkı sıkıya uyulacak, raw pointer kullanılmayacak.
+
+Çıktı olarak verilen kodlar core/include/core/ ve core/src/ dizin yapısına uygun olarak ayrılmalıdır.
+
+Geliştirilecek Sınıflar:
+
+Scanner: Verilen kök dizini tarayacak. .git, build, node_modules gibi klasörleri ve .exe, .dll, .png gibi binary dosyaları es geçecek gelişmiş bir filtreleme yapısına sahip olmalı.
+
+Packager: Scanner'dan gelen dosya yollarını okuyacak. Her dosyanın başına ve sonuna ayırıcı başlıklar (örn: ==== FILE: src/main.cpp ====) ekleyecek.
+
+ChunkManager: Packager'ın ürettiği veriyi bellek dostu bir şekilde tam olarak 400 KB sınırını aşmayacak parçalara (chunk) bölecek ve bellekte tutacak.
+
+IndexBuilder: Taranan tüm dosyaların ve atlanan dosyaların ağaç yapısını barındıran bir INDEX.txt içeriği oluşturacak.
+
+============================================================
+FILE: core/CMakeLists.txt
+============================================================
+add_library(aipackager_core STATIC
+    src/Scanner.cpp
+    src/ChunkManager.cpp
+    src/IndexBuilder.cpp
+    src/Packager.cpp
+)
+
+target_include_directories(aipackager_core
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(aipackager_core PUBLIC cxx_std_20)
+
+if(MSVC)
+    target_compile_options(aipackager_core PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager_core PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+
+============================================================
+FILE: core/include/core/Scanner.hpp
+============================================================
+#pragma once
+
+#include <cstdint>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <unordered_set>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Describes why a file system entry was skipped during scanning.
+ */
+enum class SkipReason {
+    ExcludedDirectory,
+    ExcludedExtension,
+    BinaryHeuristic,
+    PermissionDenied,
+    NotRegularFile,
+    SymlinkSkipped,
+    FilesystemError
+};
+
+/**
+ * @brief Metadata for a file that passed filtering and will be packaged.
+ */
+struct ScannedFile {
+    std::filesystem::path absolutePath;
+    std::filesystem::path relativePath;
+    std::uintmax_t sizeBytes {0};
+};
+
+/**
+ * @brief Metadata for a path that was skipped by filtering or due to an error.
+ */
+struct SkippedItem {
+    std::filesystem::path absolutePath;
+    std::filesystem::path relativePath;
+    SkipReason reason {SkipReason::FilesystemError};
+    std::string details;
+};
+
+/**
+ * @brief Immutable scan output used by packaging and index generation.
+ */
+struct ScanReport {
+    std::filesystem::path rootPath;
+    std::vector<ScannedFile> includedFiles;
+    std::vector<SkippedItem> skippedItems;
+    std::uintmax_t totalIncludedBytes {0};
+};
+
+/**
+ * @brief Configuration for directory and file filtering.
+ */
+struct ScannerOptions {
+    /**
+     * @brief Directory names to skip anywhere in the tree.
+     * Example: .git, build, node_modules
+     */
+    std::unordered_set<std::string> excludedDirectoryNames;
+
+    /**
+     * @brief File extensions (lowercase, including dot) to skip.
+     * Example: .exe, .dll, .png, .mp4
+     */
+    std::unordered_set<std::string> excludedExtensions;
+
+    /**
+     * @brief If false, symbolic links are ignored.
+     */
+    bool followSymlinks {false};
+
+    /**
+     * @brief If true, unknown extensions are treated as potential text files.
+     * If false, simple binary-byte heuristics may skip suspicious files.
+     */
+    bool allowUnknownExtensions {true};
+
+    /**
+     * @brief Builds production-ready defaults for common source repositories.
+     * @return Default options instance.
+     */
+    [[nodiscard]] static ScannerOptions Default();
+};
+
+/**
+ * @brief Scans a project tree and returns include/skip results with reasons.
+ */
+class Scanner final {
+public:
+    /**
+     * @brief Creates a scanner with a filtering policy.
+     * @param options Scanning options and exclusion sets.
+     */
+    explicit Scanner(ScannerOptions options = ScannerOptions::Default()) noexcept;
+
+    /**
+     * @brief Scans a root directory recursively.
+     * @param rootDirectory Absolute or relative root path to scan.
+     * @param errorMessage Output text for fatal validation or traversal errors.
+     * @return A populated scan report on success, std::nullopt on fatal errors.
+     */
+    [[nodiscard]] std::optional<ScanReport> Scan(
+        const std::filesystem::path& rootDirectory,
+        std::string& errorMessage) const noexcept;
+
+    /**
+     * @brief Checks whether a directory name should be excluded by policy.
+     * @param directoryName Directory name without parent path context.
+     * @return True if the directory should be skipped.
+     */
+    [[nodiscard]] bool ShouldSkipDirectory(std::string_view directoryName) const noexcept;
+
+    /**
+     * @brief Checks whether a file extension should be excluded by policy.
+     * @param extension File extension including leading dot.
+     * @return True if the extension is excluded.
+     */
+    [[nodiscard]] bool ShouldSkipExtension(std::string_view extension) const noexcept;
+
+    /**
+     * @brief Returns scanner options currently in use.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const ScannerOptions& options() const noexcept;
+
+private:
+    ScannerOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/include/core/ChunkManager.hpp
+============================================================
+#pragma once
+
+#include <cstddef>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Owns and builds bounded text chunks for downstream AI ingestion.
+ */
+class ChunkManager final {
+public:
+    static constexpr std::size_t kDefaultChunkBytes = 400U * 1024U;
+
+    /**
+     * @brief Aggregate counters for packaged chunk data.
+     */
+    struct Statistics {
+        std::size_t chunkCount {0};
+        std::size_t maxChunkBytes {0};
+        std::size_t totalBytes {0};
+    };
+
+    /**
+     * @brief Creates an empty chunk manager.
+     * @param maxChunkBytes Hard upper bound for each chunk in bytes.
+     */
+    explicit ChunkManager(std::size_t maxChunkBytes = kDefaultChunkBytes) noexcept;
+
+    /**
+     * @brief Resets all buffered chunks and counters.
+     */
+    void Reset() noexcept;
+
+    /**
+     * @brief Appends text and auto-splits data to keep chunk size constraints.
+     * @param content Arbitrary text payload to append.
+     */
+    void Append(std::string_view content);
+
+    /**
+     * @brief Appends a full line and enforces a trailing newline if missing.
+     * @param line Input line without ownership transfer.
+     */
+    void AppendLine(std::string_view line);
+
+    /**
+     * @brief Returns immutable access to all generated chunks.
+     * @return Chunk list where each element is <= maxChunkBytes().
+     */
+    [[nodiscard]] const std::vector<std::string>& Chunks() const noexcept;
+
+    /**
+     * @brief Moves out all chunks and clears internal storage.
+     * @return Owned chunk container.
+     */
+    [[nodiscard]] std::vector<std::string> TakeChunks() noexcept;
+
+    /**
+     * @brief Reads max chunk size configured for this manager.
+     * @return Byte upper bound for individual chunks.
+     */
+    [[nodiscard]] std::size_t maxChunkBytes() const noexcept;
+
+    /**
+     * @brief Calculates runtime statistics for current chunks.
+     * @return Statistics snapshot.
+     */
+    [[nodiscard]] Statistics GetStatistics() const noexcept;
+
+private:
+    std::size_t maxChunkBytes_;
+    std::vector<std::string> chunks_;
+};
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/include/core/IndexBuilder.hpp
+============================================================
+#pragma once
+
+#include "core/Scanner.hpp"
+
+#include <string>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Formatting controls for generated INDEX.txt content.
+ */
+struct IndexBuildOptions {
+    bool includeSummarySection {true};
+    bool includeIncludedFilesSection {true};
+    bool includeSkippedItemsSection {true};
+    bool sortEntriesLexicographically {true};
+    std::string lineEnding {"\n"};
+};
+
+/**
+ * @brief Creates a formatted INDEX.txt payload from scanner output.
+ */
+class IndexBuilder final {
+public:
+    /**
+     * @brief Creates an index builder with formatting options.
+     * @param options Output formatting and section toggles.
+     */
+    explicit IndexBuilder(IndexBuildOptions options = {}) noexcept;
+
+    /**
+     * @brief Builds INDEX.txt content from a scan report.
+     * @param report Included and skipped scan entries.
+     * @return Fully formatted index text.
+     */
+    [[nodiscard]] std::string Build(const ScanReport& report) const;
+
+    /**
+     * @brief Converts a skip reason enum to human-readable text.
+     * @param reason Skip reason value.
+     * @return Stable reason label.
+     */
+    [[nodiscard]] static std::string ToString(SkipReason reason);
+
+    /**
+     * @brief Returns active formatting options.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const IndexBuildOptions& options() const noexcept;
+
+private:
+    IndexBuildOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/include/core/Packager.hpp
+============================================================
+#pragma once
+
+#include "core/ChunkManager.hpp"
+#include "core/IndexBuilder.hpp"
+#include "core/Scanner.hpp"
+
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Controls file boundary formatting and chunking defaults.
+ */
+struct PackagerOptions {
+    std::size_t chunkSizeBytes {ChunkManager::kDefaultChunkBytes};
+    std::string fileHeaderPrefix {"==== FILE: "};
+    std::string fileHeaderSuffix {" ====\n"};
+    std::string fileFooterPrefix {"==== END FILE: "};
+    std::string fileFooterSuffix {" ====\n"};
+    bool includeIndexAsFirstChunk {true};
+};
+
+/**
+ * @brief End-to-end output of a packaging request.
+ */
+struct PackageResult {
+    ScanReport scanReport;
+    std::string indexContent;
+    std::vector<std::string> chunks;
+};
+
+/**
+ * @brief Orchestrates scanning, index generation, file framing, and chunking.
+ */
+class Packager final {
+public:
+    /**
+     * @brief Constructs the orchestrator with explicit dependencies.
+     * @param scanner Scanner instance used for traversal and filtering.
+     * @param indexBuilder Index builder used to generate INDEX.txt payload.
+     * @param options Packaging and framing options.
+     */
+    explicit Packager(
+        Scanner scanner = Scanner {},
+        IndexBuilder indexBuilder = IndexBuilder {},
+        PackagerOptions options = {});
+
+    /**
+     * @brief Builds a full package from a project root.
+     * @param rootDirectory Root directory to package.
+     * @param errorMessage Output text for fatal orchestration failures.
+     * @return Full package result, or std::nullopt on fatal failure.
+     */
+    [[nodiscard]] std::optional<PackageResult> Build(
+        const std::filesystem::path& rootDirectory,
+        std::string& errorMessage) const;
+
+    /**
+     * @brief Creates a file start delimiter line for a relative path.
+     * @param relativePath Path relative to scan root.
+     * @param options Active formatting options.
+     * @return Formatted header delimiter.
+     */
+    [[nodiscard]] static std::string MakeFileHeader(
+        std::string_view relativePath,
+        const PackagerOptions& options);
+
+    /**
+     * @brief Creates a file end delimiter line for a relative path.
+     * @param relativePath Path relative to scan root.
+     * @param options Active formatting options.
+     * @return Formatted footer delimiter.
+     */
+    [[nodiscard]] static std::string MakeFileFooter(
+        std::string_view relativePath,
+        const PackagerOptions& options);
+
+    /**
+     * @brief Reads active packager options.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const PackagerOptions& options() const noexcept;
+
+private:
+    Scanner scanner_;
+    IndexBuilder indexBuilder_;
+    PackagerOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/src/ChunkManager.cpp
+============================================================
+#include "core/ChunkManager.hpp"
+
+#include <algorithm>
+#include <utility>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::size_t FindSafeSplitPoint(std::string_view text, std::size_t maxBytes) noexcept {
+    if (text.empty()) {
+        return 0;
+    }
+
+    if (text.size() <= maxBytes) {
+        return text.size();
+    }
+
+    const std::size_t minSearch = maxBytes > 32 ? (maxBytes * 3U) / 4U : 0U;
+
+    for (std::size_t i = maxBytes; i > minSearch; --i) {
+        const char ch = text[i - 1U];
+        if (ch == '\n') {
+            return i;
+        }
+    }
+
+    for (std::size_t i = maxBytes; i > minSearch; --i) {
+        const char ch = text[i - 1U];
+        if (ch == ' ' || ch == '\t') {
+            return i;
+        }
+    }
+
+    return maxBytes == 0 ? 1U : maxBytes;
+}
+
+} // namespace
+
+ChunkManager::ChunkManager(std::size_t maxChunkBytes) noexcept
+    : maxChunkBytes_(maxChunkBytes == 0 ? kDefaultChunkBytes : maxChunkBytes) {}
+
+void ChunkManager::Reset() noexcept {
+    chunks_.clear();
+}
+
+void ChunkManager::Append(std::string_view content) {
+    if (content.empty()) {
+        return;
+    }
+
+    std::size_t offset = 0;
+    while (offset < content.size()) {
+        if (chunks_.empty()) {
+            chunks_.emplace_back();
+        }
+
+        std::string& current = chunks_.back();
+        const std::size_t used = current.size();
+        const std::size_t freeSpace = used < maxChunkBytes_ ? (maxChunkBytes_ - used) : 0U;
+
+        if (freeSpace == 0U) {
+            chunks_.emplace_back();
+            continue;
+        }
+
+        const std::string_view remaining = content.substr(offset);
+        if (remaining.size() <= freeSpace) {
+            current.append(remaining.data(), remaining.size());
+            break;
+        }
+
+        const std::size_t take = std::max<std::size_t>(1U, FindSafeSplitPoint(remaining, freeSpace));
+        current.append(remaining.data(), take);
+        offset += take;
+
+        if (offset < content.size()) {
+            chunks_.emplace_back();
+        }
+    }
+}
+
+void ChunkManager::AppendLine(std::string_view line) {
+    Append(line);
+    if (line.empty() || !line.ends_with('\n')) {
+        Append("\n");
+    }
+}
+
+const std::vector<std::string>& ChunkManager::Chunks() const noexcept {
+    return chunks_;
+}
+
+std::vector<std::string> ChunkManager::TakeChunks() noexcept {
+    auto out = std::move(chunks_);
+    chunks_.clear();
+    return out;
+}
+
+std::size_t ChunkManager::maxChunkBytes() const noexcept {
+    return maxChunkBytes_;
+}
+
+ChunkManager::Statistics ChunkManager::GetStatistics() const noexcept {
+    Statistics stats {};
+    stats.chunkCount = chunks_.size();
+
+    for (const auto& chunk : chunks_) {
+        stats.totalBytes += chunk.size();
+        stats.maxChunkBytes = std::max(stats.maxChunkBytes, chunk.size());
+    }
+
+    return stats;
+}
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/src/Scanner.cpp
+============================================================
+#include "core/Scanner.hpp"
+
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <fstream>
+#include <system_error>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string ToLowerAscii(std::string_view value) {
+    std::string lowered;
+    lowered.reserve(value.size());
+
+    for (const char ch : value) {
+        lowered.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+    }
+
+    return lowered;
+}
+
+[[nodiscard]] std::filesystem::path SafeRelative(
+    const std::filesystem::path& root,
+    const std::filesystem::path& target) {
+    std::error_code ec;
+    std::filesystem::path rel = std::filesystem::relative(target, root, ec);
+    if (ec || rel.empty()) {
+        rel = target.lexically_relative(root);
+    }
+    if (rel.empty()) {
+        rel = target.filename();
+    }
+    return rel;
+}
+
+[[nodiscard]] bool IsKnownTextExtension(std::string_view extLower) {
+    static constexpr std::array<std::string_view, 30> kTextExtensions {
+        ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".ixx", ".m", ".mm",
+        ".py", ".js", ".ts", ".tsx", ".jsx", ".java", ".kt", ".swift", ".rs", ".go",
+        ".md", ".txt", ".json", ".yaml", ".yml", ".toml", ".xml", ".cmake", ".sh"
+    };
+
+    return std::ranges::find(kTextExtensions, extLower) != kTextExtensions.end();
+}
+
+[[nodiscard]] bool IsLikelyBinaryFile(const std::filesystem::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    if (!input.is_open()) {
+        return false;
+    }
+
+    std::array<unsigned char, 4096> buffer {};
+    input.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
+    const std::streamsize readCount = input.gcount();
+
+    if (readCount <= 0) {
+        return false;
+    }
+
+    std::size_t controlBytes = 0;
+    for (std::streamsize i = 0; i < readCount; ++i) {
+        const unsigned char c = buffer[static_cast<std::size_t>(i)];
+        if (c == 0U) {
+            return true;
+        }
+
+        const bool isAsciiControl = (c < 32U) && c != '\n' && c != '\r' && c != '\t' && c != '\f';
+        if (isAsciiControl) {
+            ++controlBytes;
+        }
+    }
+
+    const double ratio = static_cast<double>(controlBytes) / static_cast<double>(readCount);
+    return ratio > 0.30;
+}
+
+[[nodiscard]] std::string DescribeFsError(const std::error_code& ec, std::string_view fallback) {
+    if (ec) {
+        return ec.message();
+    }
+    return std::string(fallback);
+}
+
+} // namespace
+
+ScannerOptions ScannerOptions::Default() {
+    ScannerOptions options;
+
+    options.excludedDirectoryNames = {
+        ".git", ".svn", ".hg", ".idea", ".vscode", "build", "dist", "out", "bin", "obj",
+        "node_modules", ".venv", "venv", "__pycache__", ".cache", ".next", ".nuxt"
+    };
+
+    options.excludedExtensions = {
+        ".exe", ".dll", ".so", ".dylib", ".a", ".lib", ".obj", ".o", ".class", ".jar",
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg", ".mp3", ".wav",
+        ".flac", ".mp4", ".mov", ".avi", ".mkv", ".zip", ".7z", ".rar", ".tar", ".gz",
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".ttf", ".otf", ".woff",
+        ".woff2"
+    };
+
+    options.followSymlinks = false;
+    options.allowUnknownExtensions = true;
+    return options;
+}
+
+Scanner::Scanner(ScannerOptions options) noexcept
+    : options_(std::move(options)) {}
+
+std::optional<ScanReport> Scanner::Scan(
+    const std::filesystem::path& rootDirectory,
+    std::string& errorMessage) const noexcept {
+    errorMessage.clear();
+
+    try {
+        std::error_code ec;
+        const std::filesystem::path root = std::filesystem::absolute(rootDirectory, ec);
+        if (ec) {
+            errorMessage = "Root path cannot be resolved: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        if (!std::filesystem::exists(root, ec)) {
+            errorMessage = "Root directory does not exist.";
+            return std::nullopt;
+        }
+
+        if (ec) {
+            errorMessage = "Failed to inspect root directory: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        if (!std::filesystem::is_directory(root, ec) || ec) {
+            errorMessage = "Root path is not a readable directory.";
+            return std::nullopt;
+        }
+
+        ScanReport report;
+        report.rootPath = root;
+
+        auto options = std::filesystem::directory_options::skip_permission_denied;
+        if (options_.followSymlinks) {
+            options |= std::filesystem::directory_options::follow_directory_symlink;
+        }
+
+        std::filesystem::recursive_directory_iterator it(root, options, ec);
+        const std::filesystem::recursive_directory_iterator end;
+        if (ec) {
+            errorMessage = "Directory traversal failed to start: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        while (it != end) {
+            const std::filesystem::directory_entry entry = *it;
+            const std::filesystem::path absolutePath = entry.path();
+            const std::filesystem::path relativePath = SafeRelative(root, absolutePath);
+
+            std::error_code entryEc;
+
+            if (!options_.followSymlinks && entry.is_symlink(entryEc)) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::SymlinkSkipped,
+                    .details = "Symlink skipped by policy"
+                });
+
+                std::error_code dirEc;
+                if (entry.is_directory(dirEc) && !dirEc) {
+                    it.disable_recursion_pending();
+                }
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::FilesystemError,
+                        .details = DescribeFsError(incEc, "iterator increment error")
+                    });
+                    it = end;
+                }
+                continue;
+            }
+
+            if (entryEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(entryEc, "entry error")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            std::error_code dirEc;
+            if (entry.is_directory(dirEc)) {
+                const std::string directoryName = ToLowerAscii(absolutePath.filename().string());
+                if (ShouldSkipDirectory(directoryName)) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::ExcludedDirectory,
+                        .details = "Directory excluded by scanner options"
+                    });
+                    it.disable_recursion_pending();
+                }
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::PermissionDenied,
+                        .details = DescribeFsError(incEc, "permission denied or traversal error")
+                    });
+                    it = end;
+                }
+                continue;
+            }
+
+            if (dirEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(dirEc, "failed to inspect entry type")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            std::error_code fileTypeEc;
+            if (!entry.is_regular_file(fileTypeEc) || fileTypeEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::NotRegularFile,
+                    .details = fileTypeEc ? DescribeFsError(fileTypeEc, "non-regular file") : "Non-regular file skipped"
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            const std::string extension = ToLowerAscii(absolutePath.extension().string());
+            if (ShouldSkipExtension(extension)) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::ExcludedExtension,
+                    .details = "Extension excluded by scanner options"
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            if (!options_.allowUnknownExtensions && !IsKnownTextExtension(extension)) {
+                if (IsLikelyBinaryFile(absolutePath)) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::BinaryHeuristic,
+                        .details = "Binary content detected by byte heuristic"
+                    });
+
+                    std::error_code incEc;
+                    it.increment(incEc);
+                    if (incEc) {
+                        it = end;
+                    }
+                    continue;
+                }
+            }
+
+            std::error_code sizeEc;
+            const std::uintmax_t fileSize = std::filesystem::file_size(absolutePath, sizeEc);
+            if (sizeEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(sizeEc, "failed to read file size")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            report.includedFiles.push_back(ScannedFile {
+                .absolutePath = absolutePath,
+                .relativePath = relativePath,
+                .sizeBytes = fileSize
+            });
+            report.totalIncludedBytes += fileSize;
+
+            std::error_code incEc;
+            it.increment(incEc);
+            if (incEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::PermissionDenied,
+                    .details = DescribeFsError(incEc, "permission denied or traversal error")
+                });
+                it = end;
+            }
+        }
+
+        return report;
+    } catch (const std::filesystem::filesystem_error& ex) {
+        errorMessage = std::string("Filesystem failure during scan: ") + ex.what();
+        return std::nullopt;
+    } catch (const std::exception& ex) {
+        errorMessage = std::string("Unexpected scan failure: ") + ex.what();
+        return std::nullopt;
+    } catch (...) {
+        errorMessage = "Unknown scan failure.";
+        return std::nullopt;
+    }
+}
+
+bool Scanner::ShouldSkipDirectory(std::string_view directoryName) const noexcept {
+    const std::string lowered = ToLowerAscii(directoryName);
+    return options_.excludedDirectoryNames.contains(lowered);
+}
+
+bool Scanner::ShouldSkipExtension(std::string_view extension) const noexcept {
+    const std::string lowered = ToLowerAscii(extension);
+    return options_.excludedExtensions.contains(lowered);
+}
+
+const ScannerOptions& Scanner::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/src/IndexBuilder.cpp
+============================================================
+#include "core/IndexBuilder.hpp"
+
+#include <algorithm>
+#include <sstream>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string GenericPath(const std::filesystem::path& path) {
+    return path.generic_string();
+}
+
+[[nodiscard]] std::size_t PathDepth(const std::filesystem::path& path) {
+    return static_cast<std::size_t>(std::ranges::count(path.generic_string(), '/'));
+}
+
+void AppendLine(std::string& out, const std::string& line, const std::string& lineEnding) {
+    out.append(line);
+    out.append(lineEnding);
+}
+
+} // namespace
+
+IndexBuilder::IndexBuilder(IndexBuildOptions options) noexcept
+    : options_(std::move(options)) {}
+
+std::string IndexBuilder::Build(const ScanReport& report) const {
+    std::vector<ScannedFile> included = report.includedFiles;
+    std::vector<SkippedItem> skipped = report.skippedItems;
+
+    if (options_.sortEntriesLexicographically) {
+        std::ranges::sort(included, [](const ScannedFile& lhs, const ScannedFile& rhs) {
+            return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+        });
+
+        std::ranges::sort(skipped, [](const SkippedItem& lhs, const SkippedItem& rhs) {
+            return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+        });
+    }
+
+    std::string out;
+    out.reserve(4096);
+
+    AppendLine(out, "# INDEX", options_.lineEnding);
+    AppendLine(out, "", options_.lineEnding);
+    AppendLine(out, "Root: " + GenericPath(report.rootPath), options_.lineEnding);
+    AppendLine(out, "", options_.lineEnding);
+
+    if (options_.includeSummarySection) {
+        AppendLine(out, "## Summary", options_.lineEnding);
+        AppendLine(out, "- Included files: " + std::to_string(included.size()), options_.lineEnding);
+        AppendLine(out, "- Skipped items: " + std::to_string(skipped.size()), options_.lineEnding);
+        AppendLine(out, "- Total included bytes: " + std::to_string(report.totalIncludedBytes), options_.lineEnding);
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    if (options_.includeIncludedFilesSection) {
+        AppendLine(out, "## Included Files (Tree-like)", options_.lineEnding);
+
+        if (included.empty()) {
+            AppendLine(out, "- (none)", options_.lineEnding);
+        } else {
+            for (const auto& item : included) {
+                const std::size_t depth = PathDepth(item.relativePath);
+                std::string line(depth * 2U, ' ');
+                line += "- ";
+                line += GenericPath(item.relativePath);
+                line += " (";
+                line += std::to_string(item.sizeBytes);
+                line += " B)";
+                AppendLine(out, line, options_.lineEnding);
+            }
+        }
+
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    if (options_.includeSkippedItemsSection) {
+        AppendLine(out, "## Skipped Items", options_.lineEnding);
+
+        if (skipped.empty()) {
+            AppendLine(out, "- (none)", options_.lineEnding);
+        } else {
+            for (const auto& item : skipped) {
+                std::string line = "- ";
+                line += GenericPath(item.relativePath);
+                line += " | reason=";
+                line += ToString(item.reason);
+                if (!item.details.empty()) {
+                    line += " | details=";
+                    line += item.details;
+                }
+                AppendLine(out, line, options_.lineEnding);
+            }
+        }
+
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    return out;
+}
+
+std::string IndexBuilder::ToString(SkipReason reason) {
+    switch (reason) {
+    case SkipReason::ExcludedDirectory:
+        return "ExcludedDirectory";
+    case SkipReason::ExcludedExtension:
+        return "ExcludedExtension";
+    case SkipReason::BinaryHeuristic:
+        return "BinaryHeuristic";
+    case SkipReason::PermissionDenied:
+        return "PermissionDenied";
+    case SkipReason::NotRegularFile:
+        return "NotRegularFile";
+    case SkipReason::SymlinkSkipped:
+        return "SymlinkSkipped";
+    case SkipReason::FilesystemError:
+        return "FilesystemError";
+    default:
+        return "Unknown";
+    }
+}
+
+const IndexBuildOptions& IndexBuilder::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: core/src/Packager.cpp
+============================================================
+#include "core/Packager.hpp"
+
+#include <algorithm>
+#include <array>
+#include <fstream>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string GenericPath(const std::filesystem::path& path) {
+    return path.generic_string();
+}
+
+[[nodiscard]] bool StreamFileToChunks(const std::filesystem::path& filePath, ChunkManager& chunkManager) {
+    std::ifstream input(filePath, std::ios::binary);
+    if (!input.is_open()) {
+        return false;
+    }
+
+    std::array<char, 16 * 1024> buffer {};
+    while (input) {
+        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const std::streamsize readCount = input.gcount();
+        if (readCount > 0) {
+            chunkManager.Append(std::string_view(buffer.data(), static_cast<std::size_t>(readCount)));
+        }
+    }
+
+    if (!input.eof() && input.fail()) {
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
+
+Packager::Packager(Scanner scanner, IndexBuilder indexBuilder, PackagerOptions options)
+    : scanner_(std::move(scanner)),
+      indexBuilder_(std::move(indexBuilder)),
+      options_(std::move(options)) {}
+
+std::optional<PackageResult> Packager::Build(
+    const std::filesystem::path& rootDirectory,
+    std::string& errorMessage) const {
+    errorMessage.clear();
+
+    auto scanOpt = scanner_.Scan(rootDirectory, errorMessage);
+    if (!scanOpt.has_value()) {
+        return std::nullopt;
+    }
+
+    PackageResult result;
+    result.scanReport = std::move(*scanOpt);
+    result.indexContent = indexBuilder_.Build(result.scanReport);
+
+    ChunkManager chunkManager(options_.chunkSizeBytes);
+
+    if (options_.includeIndexAsFirstChunk) {
+        chunkManager.Append(MakeFileHeader("INDEX.txt", options_));
+        chunkManager.Append(result.indexContent);
+        if (!result.indexContent.empty() && !result.indexContent.ends_with('\n')) {
+            chunkManager.Append("\n");
+        }
+        chunkManager.Append(MakeFileFooter("INDEX.txt", options_));
+        chunkManager.Append("\n");
+    }
+
+    std::vector<ScannedFile> files = result.scanReport.includedFiles;
+    std::ranges::sort(files, [](const ScannedFile& lhs, const ScannedFile& rhs) {
+        return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+    });
+
+    for (const auto& file : files) {
+        if (!std::filesystem::exists(file.absolutePath)) {
+            result.scanReport.skippedItems.push_back(SkippedItem {
+                .absolutePath = file.absolutePath,
+                .relativePath = file.relativePath,
+                .reason = SkipReason::FilesystemError,
+                .details = "File disappeared before packaging"
+            });
+            continue;
+        }
+
+        chunkManager.Append(MakeFileHeader(GenericPath(file.relativePath), options_));
+
+        if (!StreamFileToChunks(file.absolutePath, chunkManager)) {
+            result.scanReport.skippedItems.push_back(SkippedItem {
+                .absolutePath = file.absolutePath,
+                .relativePath = file.relativePath,
+                .reason = SkipReason::FilesystemError,
+                .details = "Unable to read file content during packaging"
+            });
+            chunkManager.Append("\n[READ_ERROR]\n");
+        }
+
+        chunkManager.Append("\n");
+        chunkManager.Append(MakeFileFooter(GenericPath(file.relativePath), options_));
+        chunkManager.Append("\n");
+    }
+
+    result.chunks = chunkManager.TakeChunks();
+    return result;
+}
+
+std::string Packager::MakeFileHeader(std::string_view relativePath, const PackagerOptions& options) {
+    std::string out;
+    out.reserve(options.fileHeaderPrefix.size() + relativePath.size() + options.fileHeaderSuffix.size());
+    out.append(options.fileHeaderPrefix);
+    out.append(relativePath.data(), relativePath.size());
+    out.append(options.fileHeaderSuffix);
+    return out;
+}
+
+std::string Packager::MakeFileFooter(std::string_view relativePath, const PackagerOptions& options) {
+    std::string out;
+    out.reserve(options.fileFooterPrefix.size() + relativePath.size() + options.fileFooterSuffix.size());
+    out.append(options.fileFooterPrefix);
+    out.append(relativePath.data(), relativePath.size());
+    out.append(options.fileFooterSuffix);
+    return out;
+}
+
+const PackagerOptions& Packager::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+
+============================================================
+FILE: cli/CMakeLists.txt
+============================================================
+add_executable(aipackager-cli
+    src/main.cpp
+)
+
+target_link_libraries(aipackager-cli
+    PRIVATE
+        aipackager_core
+)
+
+target_compile_features(aipackager-cli PRIVATE cxx_std_20)
+
+if(MSVC)
+    target_compile_options(aipackager-cli PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager-cli PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+
+============================================================
+FILE: cli/src/main.cpp
+============================================================
+#include "core/Packager.hpp"
+
+#include <algorithm>
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <string_view>
+
+namespace {
+
+namespace fs = std::filesystem;
+
+struct CliOptions {
+    fs::path inputDir{"."};
+    fs::path outputDir{"ai_export"};
+    std::size_t maxChunkBytes{400U * 1024U};
+    bool showHelp{false};
+};
+
+void PrintUsage(std::string_view programName) {
+    std::cout
+        << "Usage: " << programName << " [--dir <path>] [--out <path>] [--max-size <bytes>]\n"
+        << "\n"
+        << "Options:\n"
+        << "  --dir       Target directory to scan (default: .)\n"
+        << "  --out       Output directory for generated files (default: ai_export)\n"
+        << "  --max-size  Max chunk size in bytes (default: 409600)\n"
+        << "  --help      Show this help message\n";
+}
+
+std::optional<std::size_t> ParsePositiveSize(std::string_view value) {
+    if (value.empty()) {
+        return std::nullopt;
+    }
+
+    std::size_t parsedValue = 0;
+    try {
+        const auto pos = static_cast<std::size_t>(std::stoull(std::string(value)));
+        if (pos == 0U) {
+            return std::nullopt;
+        }
+        parsedValue = pos;
+    } catch (...) {
+        return std::nullopt;
+    }
+
+    return parsedValue;
+}
+
+bool ParseArgs(int argc, char** argv, CliOptions& options, std::string& errorMessage) {
+    errorMessage.clear();
+
+    for (int i = 1; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+
+        if (arg == "--help") {
+            options.showHelp = true;
+            continue;
+        }
+
+        if (arg == "--dir" || arg == "--out" || arg == "--max-size") {
+            if (i + 1 >= argc) {
+                errorMessage = "Missing value for argument: " + std::string(arg);
+                return false;
+            }
+
+            const std::string_view value = argv[++i];
+            if (arg == "--dir") {
+                options.inputDir = fs::path(value);
+            } else if (arg == "--out") {
+                options.outputDir = fs::path(value);
+            } else {
+                const auto parsed = ParsePositiveSize(value);
+                if (!parsed.has_value()) {
+                    errorMessage = "Invalid --max-size value: " + std::string(value);
+                    return false;
+                }
+                options.maxChunkBytes = *parsed;
+            }
+
+            continue;
+        }
+
+        errorMessage = "Unknown argument: " + std::string(arg);
+        return false;
+    }
+
+    return true;
+}
+
+bool WriteTextFile(const fs::path& path, std::string_view content, std::string& errorMessage) {
+    std::ofstream output(path, std::ios::binary);
+    if (!output.is_open()) {
+        errorMessage = "Unable to open file for writing: " + path.string();
+        return false;
+    }
+
+    output.write(content.data(), static_cast<std::streamsize>(content.size()));
+    if (!output.good()) {
+        errorMessage = "Failed to write file: " + path.string();
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
+
+int main(int argc, char** argv) {
+    CliOptions options;
+    std::string parseError;
+
+    if (!ParseArgs(argc, argv, options, parseError)) {
+        std::cerr << "Argument error: " << parseError << "\n\n";
+        PrintUsage(argc > 0 ? argv[0] : "aipackager-cli");
+        return 1;
+    }
+
+    if (options.showHelp) {
+        PrintUsage(argc > 0 ? argv[0] : "aipackager-cli");
+        return 0;
+    }
+
+    AIPackager::Core::PackagerOptions packagerOptions;
+    packagerOptions.chunkSizeBytes = options.maxChunkBytes;
+
+    AIPackager::Core::Packager packager {
+        AIPackager::Core::Scanner {},
+        AIPackager::Core::IndexBuilder {},
+        packagerOptions};
+
+    std::string buildError;
+    auto packageResult = packager.Build(options.inputDir, buildError);
+    if (!packageResult.has_value()) {
+        std::cerr << "Packaging failed: " << buildError << "\n";
+        return 2;
+    }
+
+    std::error_code mkdirError;
+    fs::create_directories(options.outputDir, mkdirError);
+    if (mkdirError) {
+        std::cerr << "Failed to create output directory: " << options.outputDir << "\n";
+        std::cerr << "Reason: " << mkdirError.message() << "\n";
+        return 3;
+    }
+
+    std::string ioError;
+    const fs::path indexPath = options.outputDir / "INDEX.txt";
+    if (!WriteTextFile(indexPath, packageResult->indexContent, ioError)) {
+        std::cerr << ioError << "\n";
+        return 4;
+    }
+
+    const std::size_t chunkCount = packageResult->chunks.size();
+    const std::size_t width = std::max<std::size_t>(2U, std::to_string(chunkCount).size());
+
+    for (std::size_t i = 0; i < chunkCount; ++i) {
+        std::ostringstream fileName;
+        fileName << "SOURCE_part" << std::setfill('0') << std::setw(static_cast<int>(width)) << (i + 1) << ".txt";
+
+        const fs::path chunkPath = options.outputDir / fileName.str();
+        if (!WriteTextFile(chunkPath, packageResult->chunks[i], ioError)) {
+            std::cerr << ioError << "\n";
+            return 5;
+        }
+    }
+
+    std::cout << "Packaging completed successfully.\n";
+    std::cout << "Output directory: " << options.outputDir << "\n";
+    std::cout << "INDEX file: " << indexPath << "\n";
+    std::cout << "Chunk files: " << chunkCount << "\n";
+
+    return 0;
+}
+
+
+============================================================
+FILE: gui/CMakeLists.txt
+============================================================
+include(FetchContent)
+
+set(FETCHCONTENT_QUIET OFF)
+
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+)
+
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.8
+)
+
+FetchContent_MakeAvailable(glfw imgui)
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+
+add_library(imgui_static STATIC
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui_static
+    PUBLIC
+        ${IMGUI_DIR}
+        ${IMGUI_DIR}/backends
+)
+
+target_link_libraries(imgui_static PUBLIC glfw)
+target_compile_features(imgui_static PUBLIC cxx_std_20)
+
+if(MSVC)
+    target_compile_options(imgui_static PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(imgui_static PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+find_package(OpenGL REQUIRED)
+
+add_executable(aipackager-gui
+    src/main.cpp
+)
+
+target_link_libraries(aipackager-gui
+    PRIVATE
+        aipackager_core
+        imgui_static
+        glfw
+        OpenGL::GL
+)
+
+target_compile_features(aipackager-gui PRIVATE cxx_std_20)
+
+target_include_directories(aipackager-gui
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/core/include
+)
+
+if(MSVC)
+    target_compile_options(aipackager-gui PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager-gui PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+
+============================================================
+FILE: gui/src/main.cpp
+============================================================
+#include "core/Packager.hpp"
+
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
+#include <GLFW/glfw3.h>
+
+#include <cstddef>
+#include <filesystem>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace {
+
+namespace fs = std::filesystem;
+
+struct ClipboardItem {
+    std::string name;
+    std::string content;
+};
+
+struct AppState {
+    std::string droppedPath;
+    std::string statusMessage {"Drop a folder to start packaging."};
+    bool lastRunSucceeded {false};
+    bool isProcessing {false};
+    std::size_t maxChunkSizeBytes {AIPackager::Core::ChunkManager::kDefaultChunkBytes};
+    std::vector<ClipboardItem> generatedItems;
+};
+
+void ApplyDarkTheme() {
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 8.0F;
+    style.FrameRounding = 6.0F;
+    style.GrabRounding = 6.0F;
+    style.PopupRounding = 6.0F;
+    style.ScrollbarRounding = 8.0F;
+    style.TabRounding = 6.0F;
+    style.WindowBorderSize = 1.0F;
+    style.FrameBorderSize = 1.0F;
+
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4(0.08F, 0.09F, 0.11F, 1.00F);
+    colors[ImGuiCol_Header] = ImVec4(0.16F, 0.20F, 0.26F, 1.00F);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.25F, 0.31F, 0.40F, 1.00F);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.30F, 0.37F, 0.47F, 1.00F);
+    colors[ImGuiCol_Button] = ImVec4(0.18F, 0.23F, 0.30F, 1.00F);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.27F, 0.34F, 0.44F, 1.00F);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.33F, 0.41F, 0.53F, 1.00F);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.12F, 0.14F, 0.18F, 1.00F);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.21F, 0.25F, 0.33F, 1.00F);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.25F, 0.31F, 0.41F, 1.00F);
+}
+
+std::string BuildSuccessMessage(std::size_t chunkCount) {
+    std::ostringstream oss;
+    oss << "Packaging completed successfully. Generated " << chunkCount << " chunk(s).";
+    return oss.str();
+}
+
+void RunPackaging(AppState& state, const fs::path& folderPath) {
+    state.isProcessing = true;
+    state.lastRunSucceeded = false;
+    state.statusMessage = "Packaging in progress...";
+    state.generatedItems.clear();
+
+    AIPackager::Core::PackagerOptions options;
+    options.chunkSizeBytes = state.maxChunkSizeBytes;
+
+    AIPackager::Core::Packager packager {
+        AIPackager::Core::Scanner {},
+        AIPackager::Core::IndexBuilder {},
+        options};
+
+    std::string errorMessage;
+    auto result = packager.Build(folderPath, errorMessage);
+    if (!result.has_value()) {
+        state.statusMessage = "Error: " + errorMessage;
+        state.isProcessing = false;
+        return;
+    }
+
+    state.generatedItems.push_back(ClipboardItem {
+        .name = "INDEX.txt",
+        .content = result->indexContent
+    });
+
+    for (std::size_t i = 0; i < result->chunks.size(); ++i) {
+        std::ostringstream name;
+        name << "SOURCE_part";
+        if ((i + 1U) < 10U) {
+            name << '0';
+        }
+        name << (i + 1U) << ".txt";
+
+        state.generatedItems.push_back(ClipboardItem {
+            .name = name.str(),
+            .content = result->chunks[i]
+        });
+    }
+
+    state.statusMessage = BuildSuccessMessage(result->chunks.size());
+    state.lastRunSucceeded = true;
+    state.isProcessing = false;
+}
+
+void DropCallback(GLFWwindow* window, int pathCount, const char** paths) {
+    if (window == nullptr || pathCount <= 0 || paths == nullptr) {
+        return;
+    }
+
+    auto* state = static_cast<AppState*>(glfwGetWindowUserPointer(window));
+    if (state == nullptr) {
+        return;
+    }
+
+    fs::path dropped = fs::path(paths[0]);
+    state->droppedPath = dropped.string();
+
+    std::error_code ec;
+    if (!fs::exists(dropped, ec) || ec) {
+        state->statusMessage = "Error: dropped path does not exist.";
+        state->lastRunSucceeded = false;
+        state->generatedItems.clear();
+        return;
+    }
+
+    if (!fs::is_directory(dropped, ec) || ec) {
+        state->statusMessage = "Error: please drop a directory, not a file.";
+        state->lastRunSucceeded = false;
+        state->generatedItems.clear();
+        return;
+    }
+
+    RunPackaging(*state, dropped);
+}
+
+} // namespace
+
+int main() {
+    if (!glfwInit()) {
+        return 1;
+    }
+
+    const char* glslVersion = "#version 130";
+#if defined(__APPLE__)
+    glslVersion = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#endif
+
+    GLFWwindow* window = glfwCreateWindow(1280, 800, "AI Packager - Desktop", nullptr, nullptr);
+    if (window == nullptr) {
+        glfwTerminate();
+        return 2;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    ApplyDarkTheme();
+
+    if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) {
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 3;
+    }
+
+    if (!ImGui_ImplOpenGL3_Init(glslVersion)) {
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 4;
+    }
+
+    AppState appState;
+    glfwSetWindowUserPointer(window, &appState);
+    glfwSetDropCallback(window, DropCallback);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::SetNextWindowPos(ImVec2(20.0F, 20.0F), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1240.0F, 760.0F), ImGuiCond_Once);
+        ImGui::Begin("AIPackager Desktop", nullptr, ImGuiWindowFlags_NoCollapse);
+
+        ImGui::TextUnformatted("Drag and drop a folder into this window to generate AI-ready chunks.");
+        ImGui::Separator();
+
+        ImGui::Text("Last dropped path: %s", appState.droppedPath.empty() ? "(none)" : appState.droppedPath.c_str());
+        ImGui::Text("Chunk size limit: %zu bytes", appState.maxChunkSizeBytes);
+
+        if (appState.isProcessing) {
+            ImGui::TextUnformatted("Status: Processing...");
+        } else {
+            ImVec4 statusColor = appState.lastRunSucceeded
+                ? ImVec4(0.36F, 0.85F, 0.45F, 1.00F)
+                : ImVec4(0.95F, 0.45F, 0.45F, 1.00F);
+            ImGui::TextColored(statusColor, "Status: %s", appState.statusMessage.c_str());
+        }
+
+        ImGui::Separator();
+        ImGui::Text("Generated items: %zu", appState.generatedItems.size());
+
+        if (ImGui::BeginTable("generated_table", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY, ImVec2(0.0F, 0.0F))) {
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch, 0.45F);
+            ImGui::TableSetupColumn("Size (bytes)", ImGuiTableColumnFlags_WidthStretch, 0.20F);
+            ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthStretch, 0.35F);
+            ImGui::TableHeadersRow();
+
+            for (std::size_t i = 0; i < appState.generatedItems.size(); ++i) {
+                const ClipboardItem& item = appState.generatedItems[i];
+
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::TextUnformatted(item.name.c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%zu", item.content.size());
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::PushID(static_cast<int>(i));
+                if (ImGui::Button("Copy to Clipboard")) {
+                    ImGui::SetClipboardText(item.content.c_str());
+                }
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+
+        ImGui::End();
+
+        ImGui::Render();
+        int displayWidth = 0;
+        int displayHeight = 0;
+        glfwGetFramebufferSize(window, &displayWidth, &displayHeight);
+        glViewport(0, 0, displayWidth, displayHeight);
+        glClearColor(0.08F, 0.09F, 0.11F, 1.00F);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
+}
+
+
+==== END FILE: ai_export/SOURCE_part01.txt ====
+
+==== FILE: cli/CMakeLists.txt ====
+add_executable(aipackager-cli
+    src/main.cpp
+)
+
+target_link_libraries(aipackager-cli
+    PRIVATE
+        aipackager_core
+)
+
+target_compile_features(aipackager-cli PRIVATE cxx_std_20)
+
+if(MSVC)
+    target_compile_options(aipackager-cli PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager-cli PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+==== END FILE: cli/CMakeLists.txt ====
+
+==== FILE: cli/src/main.cpp ====
+#include "core/Packager.hpp"
+
+#include <algorithm>
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <string_view>
+
+namespace {
+
+namespace fs = std::filesystem;
+
+struct CliOptions {
+    fs::path inputDir{"."};
+    fs::path outputDir{"ai_export"};
+    std::size_t maxChunkBytes{400U * 1024U};
+    bool showHelp{false};
+};
+
+void PrintUsage(std::string_view programName) {
+    std::cout
+        << "Usage: " << programName << " [--dir <path>] [--out <path>] [--max-size <bytes>]\n"
+        << "\n"
+        << "Options:\n"
+        << "  --dir       Target directory to scan (default: .)\n"
+        << "  --out       Output directory for generated files (default: ai_export)\n"
+        << "  --max-size  Max chunk size in bytes (default: 409600)\n"
+        << "  --help      Show this help message\n";
+}
+
+std::optional<std::size_t> ParsePositiveSize(std::string_view value) {
+    if (value.empty()) {
+        return std::nullopt;
+    }
+
+    std::size_t parsedValue = 0;
+    try {
+        const auto pos = static_cast<std::size_t>(std::stoull(std::string(value)));
+        if (pos == 0U) {
+            return std::nullopt;
+        }
+        parsedValue = pos;
+    } catch (...) {
+        return std::nullopt;
+    }
+
+    return parsedValue;
+}
+
+bool ParseArgs(int argc, char** argv, CliOptions& options, std::string& errorMessage) {
+    errorMessage.clear();
+
+    for (int i = 1; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+
+        if (arg == "--help") {
+            options.showHelp = true;
+            continue;
+        }
+
+        if (arg == "--dir" || arg == "--out" || arg == "--max-size") {
+            if (i + 1 >= argc) {
+                errorMessage = "Missing value for argument: " + std::string(arg);
+                return false;
+            }
+
+            const std::string_view value = argv[++i];
+            if (arg == "--dir") {
+                options.inputDir = fs::path(value);
+            } else if (arg == "--out") {
+                options.outputDir = fs::path(value);
+            } else {
+                const auto parsed = ParsePositiveSize(value);
+                if (!parsed.has_value()) {
+                    errorMessage = "Invalid --max-size value: " + std::string(value);
+                    return false;
+                }
+                options.maxChunkBytes = *parsed;
+            }
+
+            continue;
+        }
+
+        errorMessage = "Unknown argument: " + std::string(arg);
+        return false;
+    }
+
+    return true;
+}
+
+bool WriteTextFile(const fs::path& path, std::string_view content, std::string& errorMessage) {
+    std::ofstream output(path, std::ios::binary);
+    if (!output.is_open()) {
+        errorMessage = "Unable to open file for writing: " + path.string();
+        return false;
+    }
+
+    output.write(content.data(), static_cast<std::streamsize>(content.size()));
+    if (!output.good()) {
+        errorMessage = "Failed to write file: " + path.string();
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
+
+int main(int argc, char** argv) {
+    CliOptions options;
+    std::string parseError;
+
+    if (!ParseArgs(argc, argv, options, parseError)) {
+        std::cerr << "Argument error: " << parseError << "\n\n";
+        PrintUsage(argc > 0 ? argv[0] : "aipackager-cli");
+        return 1;
+    }
+
+    if (options.showHelp) {
+        PrintUsage(argc > 0 ? argv[0] : "aipackager-cli");
+        return 0;
+    }
+
+    AIPackager::Core::PackagerOptions packagerOptions;
+    packagerOptions.chunkSizeBytes = options.maxChunkBytes;
+
+    AIPackager::Core::Packager packager {
+        AIPackager::Core::Scanner {},
+        AIPackager::Core::IndexBuilder {},
+        packagerOptions};
+
+    std::string buildError;
+    auto packageResult = packager.Build(options.inputDir, buildError);
+    if (!packageResult.has_value()) {
+        std::cerr << "Packaging failed: " << buildError << "\n";
+        return 2;
+    }
+
+    std::error_code mkdirError;
+    fs::create_directories(options.outputDir, mkdirError);
+    if (mkdirError) {
+        std::cerr << "Failed to create output directory: " << options.outputDir << "\n";
+        std::cerr << "Reason: " << mkdirError.message() << "\n";
+        return 3;
+    }
+
+    std::string ioError;
+    const fs::path indexPath = options.outputDir / "INDEX.txt";
+    if (!WriteTextFile(indexPath, packageResult->indexContent, ioError)) {
+        std::cerr << ioError << "\n";
+        return 4;
+    }
+
+    const std::size_t chunkCount = packageResult->chunks.size();
+    const std::size_t width = std::max<std::size_t>(2U, std::to_string(chunkCount).size());
+
+    for (std::size_t i = 0; i < chunkCount; ++i) {
+        std::ostringstream fileName;
+        fileName << "SOURCE_part" << std::setfill('0') << std::setw(static_cast<int>(width)) << (i + 1) << ".txt";
+
+        const fs::path chunkPath = options.outputDir / fileName.str();
+        if (!WriteTextFile(chunkPath, packageResult->chunks[i], ioError)) {
+            std::cerr << ioError << "\n";
+            return 5;
+        }
+    }
+
+    std::cout << "Packaging completed successfully.\n";
+    std::cout << "Output directory: " << options.outputDir << "\n";
+    std::cout << "INDEX file: " << indexPath << "\n";
+    std::cout << "Chunk files: " << chunkCount << "\n";
+
+    return 0;
+}
+
+==== END FILE: cli/src/main.cpp ====
+
+==== FILE: core/CMakeLists.txt ====
+add_library(aipackager_core STATIC
+    src/Scanner.cpp
+    src/ChunkManager.cpp
+    src/IndexBuilder.cpp
+    src/Packager.cpp
+)
+
+target_include_directories(aipackager_core
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(aipackager_core PUBLIC cxx_std_20)
+
+if(MSVC)
+    target_compile_options(aipackager_core PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager_core PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+==== END FILE: core/CMakeLists.txt ====
+
+==== FILE: core/include/core/ChunkManager.hpp ====
+#pragma once
+
+#include <cstddef>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Owns and builds bounded text chunks for downstream AI ingestion.
+ */
+class ChunkManager final {
+public:
+    static constexpr std::size_t kDefaultChunkBytes = 400U * 1024U;
+
+    /**
+     * @brief Aggregate counters for packaged chunk data.
+     */
+    struct Statistics {
+        std::size_t chunkCount {0};
+        std::size_t maxChunkBytes {0};
+        std::size_t totalBytes {0};
+    };
+
+    /**
+     * @brief Creates an empty chunk manager.
+     * @param maxChunkBytes Hard upper bound for each chunk in bytes.
+     */
+    explicit ChunkManager(std::size_t maxChunkBytes = kDefaultChunkBytes) noexcept;
+
+    /**
+     * @brief Resets all buffered chunks and counters.
+     */
+    void Reset() noexcept;
+
+    /**
+     * @brief Appends text and auto-splits data to keep chunk size constraints.
+     * @param content Arbitrary text payload to append.
+     */
+    void Append(std::string_view content);
+
+    /**
+     * @brief Appends a full line and enforces a trailing newline if missing.
+     * @param line Input line without ownership transfer.
+     */
+    void AppendLine(std::string_view line);
+
+    /**
+     * @brief Returns immutable access to all generated chunks.
+     * @return Chunk list where each element is <= maxChunkBytes().
+     */
+    [[nodiscard]] const std::vector<std::string>& Chunks() const noexcept;
+
+    /**
+     * @brief Moves out all chunks and clears internal storage.
+     * @return Owned chunk container.
+     */
+    [[nodiscard]] std::vector<std::string> TakeChunks() noexcept;
+
+    /**
+     * @brief Reads max chunk size configured for this manager.
+     * @return Byte upper bound for individual chunks.
+     */
+    [[nodiscard]] std::size_t maxChunkBytes() const noexcept;
+
+    /**
+     * @brief Calculates runtime statistics for current chunks.
+     * @return Statistics snapshot.
+     */
+    [[nodiscard]] Statistics GetStatistics() const noexcept;
+
+private:
+    std::size_t maxChunkBytes_;
+    std::vector<std::string> chunks_;
+};
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/include/core/ChunkManager.hpp ====
+
+==== FILE: core/include/core/IndexBuilder.hpp ====
+#pragma once
+
+#include "core/Scanner.hpp"
+
+#include <string>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Formatting controls for generated INDEX.txt content.
+ */
+struct IndexBuildOptions {
+    bool includeSummarySection {true};
+    bool includeIncludedFilesSection {true};
+    bool includeSkippedItemsSection {true};
+    bool sortEntriesLexicographically {true};
+    std::string lineEnding {"\n"};
+};
+
+/**
+ * @brief Creates a formatted INDEX.txt payload from scanner output.
+ */
+class IndexBuilder final {
+public:
+    /**
+     * @brief Creates an index builder with formatting options.
+     * @param options Output formatting and section toggles.
+     */
+    explicit IndexBuilder(IndexBuildOptions options = {}) noexcept;
+
+    /**
+     * @brief Builds INDEX.txt content from a scan report.
+     * @param report Included and skipped scan entries.
+     * @return Fully formatted index text.
+     */
+    [[nodiscard]] std::string Build(const ScanReport& report) const;
+
+    /**
+     * @brief Converts a skip reason enum to human-readable text.
+     * @param reason Skip reason value.
+     * @return Stable reason label.
+     */
+    [[nodiscard]] static std::string ToString(SkipReason reason);
+
+    /**
+     * @brief Returns active formatting options.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const IndexBuildOptions& options() const noexcept;
+
+private:
+    IndexBuildOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/include/core/IndexBuilder.hpp ====
+
+==== FILE: core/include/core/Packager.hpp ====
+#pragma once
+
+#include "core/ChunkManager.hpp"
+#include "core/IndexBuilder.hpp"
+#include "core/Scanner.hpp"
+
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Controls file boundary formatting and chunking defaults.
+ */
+struct PackagerOptions {
+    std::size_t chunkSizeBytes {ChunkManager::kDefaultChunkBytes};
+    std::string fileHeaderPrefix {"==== FILE: "};
+    std::string fileHeaderSuffix {" ====\n"};
+    std::string fileFooterPrefix {"==== END FILE: "};
+    std::string fileFooterSuffix {" ====\n"};
+    bool includeIndexAsFirstChunk {true};
+};
+
+/**
+ * @brief End-to-end output of a packaging request.
+ */
+struct PackageResult {
+    ScanReport scanReport;
+    std::string indexContent;
+    std::vector<std::string> chunks;
+};
+
+/**
+ * @brief Orchestrates scanning, index generation, file framing, and chunking.
+ */
+class Packager final {
+public:
+    /**
+     * @brief Constructs the orchestrator with explicit dependencies.
+     * @param scanner Scanner instance used for traversal and filtering.
+     * @param indexBuilder Index builder used to generate INDEX.txt payload.
+     * @param options Packaging and framing options.
+     */
+    explicit Packager(
+        Scanner scanner = Scanner {},
+        IndexBuilder indexBuilder = IndexBuilder {},
+        PackagerOptions options = {});
+
+    /**
+     * @brief Builds a full package from a project root.
+     * @param rootDirectory Root directory to package.
+     * @param errorMessage Output text for fatal orchestration failures.
+     * @return Full package result, or std::nullopt on fatal failure.
+     */
+    [[nodiscard]] std::optional<PackageResult> Build(
+        const std::filesystem::path& rootDirectory,
+        std::string& errorMessage) const;
+
+    /**
+     * @brief Creates a file start delimiter line for a relative path.
+     * @param relativePath Path relative to scan root.
+     * @param options Active formatting options.
+     * @return Formatted header delimiter.
+     */
+    [[nodiscard]] static std::string MakeFileHeader(
+        std::string_view relativePath,
+        const PackagerOptions& options);
+
+    /**
+     * @brief Creates a file end delimiter line for a relative path.
+     * @param relativePath Path relative to scan root.
+     * @param options Active formatting options.
+     * @return Formatted footer delimiter.
+     */
+    [[nodiscard]] static std::string MakeFileFooter(
+        std::string_view relativePath,
+        const PackagerOptions& options);
+
+    /**
+     * @brief Reads active packager options.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const PackagerOptions& options() const noexcept;
+
+private:
+    Scanner scanner_;
+    IndexBuilder indexBuilder_;
+    PackagerOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/include/core/Packager.hpp ====
+
+==== FILE: core/include/core/Scanner.hpp ====
+#pragma once
+
+#include <cstdint>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <unordered_set>
+#include <vector>
+
+namespace AIPackager::Core {
+
+/**
+ * @brief Describes why a file system entry was skipped during scanning.
+ */
+enum class SkipReason {
+    ExcludedDirectory,
+    ExcludedExtension,
+    BinaryHeuristic,
+    PermissionDenied,
+    NotRegularFile,
+    SymlinkSkipped,
+    FilesystemError
+};
+
+/**
+ * @brief Metadata for a file that passed filtering and will be packaged.
+ */
+struct ScannedFile {
+    std::filesystem::path absolutePath;
+    std::filesystem::path relativePath;
+    std::uintmax_t sizeBytes {0};
+};
+
+/**
+ * @brief Metadata for a path that was skipped by filtering or due to an error.
+ */
+struct SkippedItem {
+    std::filesystem::path absolutePath;
+    std::filesystem::path relativePath;
+    SkipReason reason {SkipReason::FilesystemError};
+    std::string details;
+};
+
+/**
+ * @brief Immutable scan output used by packaging and index generation.
+ */
+struct ScanReport {
+    std::filesystem::path rootPath;
+    std::vector<ScannedFile> includedFiles;
+    std::vector<SkippedItem> skippedItems;
+    std::uintmax_t totalIncludedBytes {0};
+};
+
+/**
+ * @brief Configuration for directory and file filtering.
+ */
+struct ScannerOptions {
+    /**
+     * @brief Directory names to skip anywhere in the tree.
+     * Example: .git, build, node_modules
+     */
+    std::unordered_set<std::string> excludedDirectoryNames;
+
+    /**
+     * @brief File extensions (lowercase, including dot) to skip.
+     * Example: .exe, .dll, .png, .mp4
+     */
+    std::unordered_set<std::string> excludedExtensions;
+
+    /**
+     * @brief If false, symbolic links are ignored.
+     */
+    bool followSymlinks {false};
+
+    /**
+     * @brief If true, unknown extensions are treated as potential text files.
+     * If false, simple binary-byte heuristics may skip suspicious files.
+     */
+    bool allowUnknownExtensions {true};
+
+    /**
+     * @brief Builds production-ready defaults for common source repositories.
+     * @return Default options instance.
+     */
+    [[nodiscard]] static ScannerOptions Default();
+};
+
+/**
+ * @brief Scans a project tree and returns include/skip results with reasons.
+ */
+class Scanner final {
+public:
+    /**
+     * @brief Creates a scanner with a filtering policy.
+     * @param options Scanning options and exclusion sets.
+     */
+    explicit Scanner(ScannerOptions options = ScannerOptions::Default()) noexcept;
+
+    /**
+     * @brief Scans a root directory recursively.
+     * @param rootDirectory Absolute or relative root path to scan.
+     * @param errorMessage Output text for fatal validation or traversal errors.
+     * @return A populated scan report on success, std::nullopt on fatal errors.
+     */
+    [[nodiscard]] std::optional<ScanReport> Scan(
+        const std::filesystem::path& rootDirectory,
+        std::string& errorMessage) const noexcept;
+
+    /**
+     * @brief Checks whether a directory name should be excluded by policy.
+     * @param directoryName Directory name without parent path context.
+     * @return True if the directory should be skipped.
+     */
+    [[nodiscard]] bool ShouldSkipDirectory(std::string_view directoryName) const noexcept;
+
+    /**
+     * @brief Checks whether a file extension should be excluded by policy.
+     * @param extension File extension including leading dot.
+     * @return True if the extension is excluded.
+     */
+    [[nodiscard]] bool ShouldSkipExtension(std::string_view extension) const noexcept;
+
+    /**
+     * @brief Returns scanner options currently in use.
+     * @return Immutable options reference.
+     */
+    [[nodiscard]] const ScannerOptions& options() const noexcept;
+
+private:
+    ScannerOptions options_;
+};
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/include/core/Scanner.hpp ====
+
+==== FILE: core/src/ChunkManager.cpp ====
+#include "core/ChunkManager.hpp"
+
+#include <algorithm>
+#include <utility>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::size_t FindSafeSplitPoint(std::string_view text, std::size_t maxBytes) noexcept {
+    if (text.empty()) {
+        return 0;
+    }
+
+    if (text.size() <= maxBytes) {
+        return text.size();
+    }
+
+    const std::size_t minSearch = maxBytes > 32 ? (maxBytes * 3U) / 4U : 0U;
+
+    for (std::size_t i = maxBytes; i > minSearch; --i) {
+        const char ch = text[i - 1U];
+        if (ch == '\n') {
+            return i;
+        }
+    }
+
+    for (std::size_t i = maxBytes; i > minSearch; --i) {
+        const char ch = text[i - 1U];
+        if (ch == ' ' || ch == '\t') {
+            return i;
+        }
+    }
+
+    return maxBytes == 0 ? 1U : maxBytes;
+}
+
+} // namespace
+
+ChunkManager::ChunkManager(std::size_t maxChunkBytes) noexcept
+    : maxChunkBytes_(maxChunkBytes == 0 ? kDefaultChunkBytes : maxChunkBytes) {}
+
+void ChunkManager::Reset() noexcept {
+    chunks_.clear();
+}
+
+void ChunkManager::Append(std::string_view content) {
+    if (content.empty()) {
+        return;
+    }
+
+    std::size_t offset = 0;
+    while (offset < content.size()) {
+        if (chunks_.empty()) {
+            chunks_.emplace_back();
+        }
+
+        std::string& current = chunks_.back();
+        const std::size_t used = current.size();
+        const std::size_t freeSpace = used < maxChunkBytes_ ? (maxChunkBytes_ - used) : 0U;
+
+        if (freeSpace == 0U) {
+            chunks_.emplace_back();
+            continue;
+        }
+
+        const std::string_view remaining = content.substr(offset);
+        if (remaining.size() <= freeSpace) {
+            current.append(remaining.data(), remaining.size());
+            break;
+        }
+
+        const std::size_t take = std::max<std::size_t>(1U, FindSafeSplitPoint(remaining, freeSpace));
+        current.append(remaining.data(), take);
+        offset += take;
+
+        if (offset < content.size()) {
+            chunks_.emplace_back();
+        }
+    }
+}
+
+void ChunkManager::AppendLine(std::string_view line) {
+    Append(line);
+    if (line.empty() || !line.ends_with('\n')) {
+        Append("\n");
+    }
+}
+
+const std::vector<std::string>& ChunkManager::Chunks() const noexcept {
+    return chunks_;
+}
+
+std::vector<std::string> ChunkManager::TakeChunks() noexcept {
+    auto out = std::move(chunks_);
+    chunks_.clear();
+    return out;
+}
+
+std::size_t ChunkManager::maxChunkBytes() const noexcept {
+    return maxChunkBytes_;
+}
+
+ChunkManager::Statistics ChunkManager::GetStatistics() const noexcept {
+    Statistics stats {};
+    stats.chunkCount = chunks_.size();
+
+    for (const auto& chunk : chunks_) {
+        stats.totalBytes += chunk.size();
+        stats.maxChunkBytes = std::max(stats.maxChunkBytes, chunk.size());
+    }
+
+    return stats;
+}
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/src/ChunkManager.cpp ====
+
+==== FILE: core/src/IndexBuilder.cpp ====
+#include "core/IndexBuilder.hpp"
+
+#include <algorithm>
+#include <sstream>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string GenericPath(const std::filesystem::path& path) {
+    return path.generic_string();
+}
+
+[[nodiscard]] std::size_t PathDepth(const std::filesystem::path& path) {
+    return static_cast<std::size_t>(std::ranges::count(path.generic_string(), '/'));
+}
+
+void AppendLine(std::string& out, const std::string& line, const std::string& lineEnding) {
+    out.append(line);
+    out.append(lineEnding);
+}
+
+} // namespace
+
+IndexBuilder::IndexBuilder(IndexBuildOptions options) noexcept
+    : options_(std::move(options)) {}
+
+std::string IndexBuilder::Build(const ScanReport& report) const {
+    std::vector<ScannedFile> included = report.includedFiles;
+    std::vector<SkippedItem> skipped = report.skippedItems;
+
+    if (options_.sortEntriesLexicographically) {
+        std::ranges::sort(included, [](const ScannedFile& lhs, const ScannedFile& rhs) {
+            return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+        });
+
+        std::ranges::sort(skipped, [](const SkippedItem& lhs, const SkippedItem& rhs) {
+            return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+        });
+    }
+
+    std::string out;
+    out.reserve(4096);
+
+    AppendLine(out, "# INDEX", options_.lineEnding);
+    AppendLine(out, "", options_.lineEnding);
+    AppendLine(out, "Root: " + GenericPath(report.rootPath), options_.lineEnding);
+    AppendLine(out, "", options_.lineEnding);
+
+    if (options_.includeSummarySection) {
+        AppendLine(out, "## Summary", options_.lineEnding);
+        AppendLine(out, "- Included files: " + std::to_string(included.size()), options_.lineEnding);
+        AppendLine(out, "- Skipped items: " + std::to_string(skipped.size()), options_.lineEnding);
+        AppendLine(out, "- Total included bytes: " + std::to_string(report.totalIncludedBytes), options_.lineEnding);
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    if (options_.includeIncludedFilesSection) {
+        AppendLine(out, "## Included Files (Tree-like)", options_.lineEnding);
+
+        if (included.empty()) {
+            AppendLine(out, "- (none)", options_.lineEnding);
+        } else {
+            for (const auto& item : included) {
+                const std::size_t depth = PathDepth(item.relativePath);
+                std::string line(depth * 2U, ' ');
+                line += "- ";
+                line += GenericPath(item.relativePath);
+                line += " (";
+                line += std::to_string(item.sizeBytes);
+                line += " B)";
+                AppendLine(out, line, options_.lineEnding);
+            }
+        }
+
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    if (options_.includeSkippedItemsSection) {
+        AppendLine(out, "## Skipped Items", options_.lineEnding);
+
+        if (skipped.empty()) {
+            AppendLine(out, "- (none)", options_.lineEnding);
+        } else {
+            for (const auto& item : skipped) {
+                std::string line = "- ";
+                line += GenericPath(item.relativePath);
+                line += " | reason=";
+                line += ToString(item.reason);
+                if (!item.details.empty()) {
+                    line += " | details=";
+                    line += item.details;
+                }
+                AppendLine(out, line, options_.lineEnding);
+            }
+        }
+
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    return out;
+}
+
+std::string IndexBuilder::ToString(SkipReason reason) {
+    switch (reason) {
+    case SkipReason::ExcludedDirectory:
+        return "ExcludedDirectory";
+    case SkipReason::ExcludedExtension:
+        return "ExcludedExtension";
+    case SkipReason::BinaryHeuristic:
+        return "BinaryHeuristic";
+    case SkipReason::PermissionDenied:
+        return "PermissionDenied";
+    case SkipReason::NotRegularFile:
+        return "NotRegularFile";
+    case SkipReason::SymlinkSkipped:
+        return "SymlinkSkipped";
+    case SkipReason::FilesystemError:
+        return "FilesystemError";
+    default:
+        return "Unknown";
+    }
+}
+
+const IndexBuildOptions& IndexBuilder::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/src/IndexBuilder.cpp ====
+
+==== FILE: core/src/Packager.cpp ====
+#include "core/Packager.hpp"
+
+#include <algorithm>
+#include <array>
+#include <fstream>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string GenericPath(const std::filesystem::path& path) {
+    return path.generic_string();
+}
+
+[[nodiscard]] bool StreamFileToChunks(const std::filesystem::path& filePath, ChunkManager& chunkManager) {
+    std::ifstream input(filePath, std::ios::binary);
+    if (!input.is_open()) {
+        return false;
+    }
+
+    std::array<char, 16 * 1024> buffer {};
+    while (input) {
+        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const std::streamsize readCount = input.gcount();
+        if (readCount > 0) {
+            chunkManager.Append(std::string_view(buffer.data(), static_cast<std::size_t>(readCount)));
+        }
+    }
+
+    if (!input.eof() && input.fail()) {
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
+
+Packager::Packager(Scanner scanner, IndexBuilder indexBuilder, PackagerOptions options)
+    : scanner_(std::move(scanner)),
+      indexBuilder_(std::move(indexBuilder)),
+      options_(std::move(options)) {}
+
+std::optional<PackageResult> Packager::Build(
+    const std::filesystem::path& rootDirectory,
+    std::string& errorMessage) const {
+    errorMessage.clear();
+
+    auto scanOpt = scanner_.Scan(rootDirectory, errorMessage);
+    if (!scanOpt.has_value()) {
+        return std::nullopt;
+    }
+
+    PackageResult result;
+    result.scanReport = std::move(*scanOpt);
+    result.indexContent = indexBuilder_.Build(result.scanReport);
+
+    ChunkManager chunkManager(options_.chunkSizeBytes);
+
+    if (options_.includeIndexAsFirstChunk) {
+        chunkManager.Append(MakeFileHeader("INDEX.txt", options_));
+        chunkManager.Append(result.indexContent);
+        if (!result.indexContent.empty() && !result.indexContent.ends_with('\n')) {
+            chunkManager.Append("\n");
+        }
+        chunkManager.Append(MakeFileFooter("INDEX.txt", options_));
+        chunkManager.Append("\n");
+    }
+
+    std::vector<ScannedFile> files = result.scanReport.includedFiles;
+    std::ranges::sort(files, [](const ScannedFile& lhs, const ScannedFile& rhs) {
+        return lhs.relativePath.generic_string() < rhs.relativePath.generic_string();
+    });
+
+    for (const auto& file : files) {
+        if (!std::filesystem::exists(file.absolutePath)) {
+            result.scanReport.skippedItems.push_back(SkippedItem {
+                .absolutePath = file.absolutePath,
+                .relativePath = file.relativePath,
+                .reason = SkipReason::FilesystemError,
+                .details = "File disappeared before packaging"
+            });
+            continue;
+        }
+
+        chunkManager.Append(MakeFileHeader(GenericPath(file.relativePath), options_));
+
+        if (!StreamFileToChunks(file.absolutePath, chunkManager)) {
+            result.scanReport.skippedItems.push_back(SkippedItem {
+                .absolutePath = file.absolutePath,
+                .relativePath = file.relativePath,
+                .reason = SkipReason::FilesystemError,
+                .details = "Unable to read file content during packaging"
+            });
+            chunkManager.Append("\n[READ_ERROR]\n");
+        }
+
+        chunkManager.Append("\n");
+        chunkManager.Append(MakeFileFooter(GenericPath(file.relativePath), options_));
+        chunkManager.Append("\n");
+    }
+
+    result.chunks = chunkManager.TakeChunks();
+    return result;
+}
+
+std::string Packager::MakeFileHeader(std::string_view relativePath, const PackagerOptions& options) {
+    std::string out;
+    out.reserve(options.fileHeaderPrefix.size() + relativePath.size() + options.fileHeaderSuffix.size());
+    out.append(options.fileHeaderPrefix);
+    out.append(relativePath.data(), relativePath.size());
+    out.append(options.fileHeaderSuffix);
+    return out;
+}
+
+std::string Packager::MakeFileFooter(std::string_view relativePath, const PackagerOptions& options) {
+    std::string out;
+    out.reserve(options.fileFooterPrefix.size() + relativePath.size() + options.fileFooterSuffix.size());
+    out.append(options.fileFooterPrefix);
+    out.append(relativePath.data(), relativePath.size());
+    out.append(options.fileFooterSuffix);
+    return out;
+}
+
+const PackagerOptions& Packager::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/src/Packager.cpp ====
+
+==== FILE: core/src/Scanner.cpp ====
+#include "core/Scanner.hpp"
+
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <fstream>
+#include <system_error>
+
+namespace AIPackager::Core {
+namespace {
+
+[[nodiscard]] std::string ToLowerAscii(std::string_view value) {
+    std::string lowered;
+    lowered.reserve(value.size());
+
+    for (const char ch : value) {
+        lowered.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+    }
+
+    return lowered;
+}
+
+[[nodiscard]] std::filesystem::path SafeRelative(
+    const std::filesystem::path& root,
+    const std::filesystem::path& target) {
+    std::error_code ec;
+    std::filesystem::path rel = std::filesystem::relative(target, root, ec);
+    if (ec || rel.empty()) {
+        rel = target.lexically_relative(root);
+    }
+    if (rel.empty()) {
+        rel = target.filename();
+    }
+    return rel;
+}
+
+[[nodiscard]] bool IsKnownTextExtension(std::string_view extLower) {
+    static constexpr std::array<std::string_view, 30> kTextExtensions {
+        ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".ixx", ".m", ".mm",
+        ".py", ".js", ".ts", ".tsx", ".jsx", ".java", ".kt", ".swift", ".rs", ".go",
+        ".md", ".txt", ".json", ".yaml", ".yml", ".toml", ".xml", ".cmake", ".sh"
+    };
+
+    return std::ranges::find(kTextExtensions, extLower) != kTextExtensions.end();
+}
+
+[[nodiscard]] bool IsLikelyBinaryFile(const std::filesystem::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    if (!input.is_open()) {
+        return false;
+    }
+
+    std::array<unsigned char, 4096> buffer {};
+    input.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
+    const std::streamsize readCount = input.gcount();
+
+    if (readCount <= 0) {
+        return false;
+    }
+
+    std::size_t controlBytes = 0;
+    for (std::streamsize i = 0; i < readCount; ++i) {
+        const unsigned char c = buffer[static_cast<std::size_t>(i)];
+        if (c == 0U) {
+            return true;
+        }
+
+        const bool isAsciiControl = (c < 32U) && c != '\n' && c != '\r' && c != '\t' && c != '\f';
+        if (isAsciiControl) {
+            ++controlBytes;
+        }
+    }
+
+    const double ratio = static_cast<double>(controlBytes) / static_cast<double>(readCount);
+    return ratio > 0.30;
+}
+
+[[nodiscard]] std::string DescribeFsError(const std::error_code& ec, std::string_view fallback) {
+    if (ec) {
+        return ec.message();
+    }
+    return std::string(fallback);
+}
+
+} // namespace
+
+ScannerOptions ScannerOptions::Default() {
+    ScannerOptions options;
+
+    options.excludedDirectoryNames = {
+        ".git", ".svn", ".hg", ".idea", ".vscode", "build", "dist", "out", "bin", "obj",
+        "node_modules", ".venv", "venv", "__pycache__", ".cache", ".next", ".nuxt"
+    };
+
+    options.excludedExtensions = {
+        ".exe", ".dll", ".so", ".dylib", ".a", ".lib", ".obj", ".o", ".class", ".jar",
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg", ".mp3", ".wav",
+        ".flac", ".mp4", ".mov", ".avi", ".mkv", ".zip", ".7z", ".rar", ".tar", ".gz",
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".ttf", ".otf", ".woff",
+        ".woff2"
+    };
+
+    options.followSymlinks = false;
+    options.allowUnknownExtensions = true;
+    return options;
+}
+
+Scanner::Scanner(ScannerOptions options) noexcept
+    : options_(std::move(options)) {}
+
+std::optional<ScanReport> Scanner::Scan(
+    const std::filesystem::path& rootDirectory,
+    std::string& errorMessage) const noexcept {
+    errorMessage.clear();
+
+    try {
+        std::error_code ec;
+        const std::filesystem::path root = std::filesystem::absolute(rootDirectory, ec);
+        if (ec) {
+            errorMessage = "Root path cannot be resolved: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        if (!std::filesystem::exists(root, ec)) {
+            errorMessage = "Root directory does not exist.";
+            return std::nullopt;
+        }
+
+        if (ec) {
+            errorMessage = "Failed to inspect root directory: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        if (!std::filesystem::is_directory(root, ec) || ec) {
+            errorMessage = "Root path is not a readable directory.";
+            return std::nullopt;
+        }
+
+        ScanReport report;
+        report.rootPath = root;
+
+        auto options = std::filesystem::directory_options::skip_permission_denied;
+        if (options_.followSymlinks) {
+            options |= std::filesystem::directory_options::follow_directory_symlink;
+        }
+
+        std::filesystem::recursive_directory_iterator it(root, options, ec);
+        const std::filesystem::recursive_directory_iterator end;
+        if (ec) {
+            errorMessage = "Directory traversal failed to start: " + DescribeFsError(ec, "unknown error");
+            return std::nullopt;
+        }
+
+        while (it != end) {
+            const std::filesystem::directory_entry entry = *it;
+            const std::filesystem::path absolutePath = entry.path();
+            const std::filesystem::path relativePath = SafeRelative(root, absolutePath);
+
+            std::error_code entryEc;
+
+            if (!options_.followSymlinks && entry.is_symlink(entryEc)) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::SymlinkSkipped,
+                    .details = "Symlink skipped by policy"
+                });
+
+                std::error_code dirEc;
+                if (entry.is_directory(dirEc) && !dirEc) {
+                    it.disable_recursion_pending();
+                }
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::FilesystemError,
+                        .details = DescribeFsError(incEc, "iterator increment error")
+                    });
+                    it = end;
+                }
+                continue;
+            }
+
+            if (entryEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(entryEc, "entry error")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            std::error_code dirEc;
+            if (entry.is_directory(dirEc)) {
+                const std::string directoryName = ToLowerAscii(absolutePath.filename().string());
+                if (ShouldSkipDirectory(directoryName)) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::ExcludedDirectory,
+                        .details = "Directory excluded by scanner options"
+                    });
+                    it.disable_recursion_pending();
+                }
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::PermissionDenied,
+                        .details = DescribeFsError(incEc, "permission denied or traversal error")
+                    });
+                    it = end;
+                }
+                continue;
+            }
+
+            if (dirEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(dirEc, "failed to inspect entry type")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            std::error_code fileTypeEc;
+            if (!entry.is_regular_file(fileTypeEc) || fileTypeEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::NotRegularFile,
+                    .details = fileTypeEc ? DescribeFsError(fileTypeEc, "non-regular file") : "Non-regular file skipped"
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            const std::string extension = ToLowerAscii(absolutePath.extension().string());
+            if (ShouldSkipExtension(extension)) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::ExcludedExtension,
+                    .details = "Extension excluded by scanner options"
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            if (!options_.allowUnknownExtensions && !IsKnownTextExtension(extension)) {
+                if (IsLikelyBinaryFile(absolutePath)) {
+                    report.skippedItems.push_back(SkippedItem {
+                        .absolutePath = absolutePath,
+                        .relativePath = relativePath,
+                        .reason = SkipReason::BinaryHeuristic,
+                        .details = "Binary content detected by byte heuristic"
+                    });
+
+                    std::error_code incEc;
+                    it.increment(incEc);
+                    if (incEc) {
+                        it = end;
+                    }
+                    continue;
+                }
+            }
+
+            std::error_code sizeEc;
+            const std::uintmax_t fileSize = std::filesystem::file_size(absolutePath, sizeEc);
+            if (sizeEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::FilesystemError,
+                    .details = DescribeFsError(sizeEc, "failed to read file size")
+                });
+
+                std::error_code incEc;
+                it.increment(incEc);
+                if (incEc) {
+                    it = end;
+                }
+                continue;
+            }
+
+            report.includedFiles.push_back(ScannedFile {
+                .absolutePath = absolutePath,
+                .relativePath = relativePath,
+                .sizeBytes = fileSize
+            });
+            report.totalIncludedBytes += fileSize;
+
+            std::error_code incEc;
+            it.increment(incEc);
+            if (incEc) {
+                report.skippedItems.push_back(SkippedItem {
+                    .absolutePath = absolutePath,
+                    .relativePath = relativePath,
+                    .reason = SkipReason::PermissionDenied,
+                    .details = DescribeFsError(incEc, "permission denied or traversal error")
+                });
+                it = end;
+            }
+        }
+
+        return report;
+    } catch (const std::filesystem::filesystem_error& ex) {
+        errorMessage = std::string("Filesystem failure during scan: ") + ex.what();
+        return std::nullopt;
+    } catch (const std::exception& ex) {
+        errorMessage = std::string("Unexpected scan failure: ") + ex.what();
+        return std::nullopt;
+    } catch (...) {
+        errorMessage = "Unknown scan failure.";
+        return std::nullopt;
+    }
+}
+
+bool Scanner::ShouldSkipDirectory(std::string_view directoryName) const noexcept {
+    const std::string lowered = ToLowerAscii(directoryName);
+    return options_.excludedDirectoryNames.contains(lowered);
+}
+
+bool Scanner::ShouldSkipExtension(std::string_view extension) const noexcept {
+    const std::string lowered = ToLowerAscii(extension);
+    return options_.excludedExtensions.contains(lowered);
+}
+
+const ScannerOptions& Scanner::options() const noexcept {
+    return options_;
+}
+
+} // namespace AIPackager::Core
+
+==== END FILE: core/src/Scanner.cpp ====
+
+==== FILE: gui/CMakeLists.txt ====
+include(FetchContent)
+
+set(FETCHCONTENT_QUIET OFF)
+
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+)
+
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.8
+)
+
+FetchContent_MakeAvailable(glfw imgui)
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+
+add_library(imgui_static STATIC
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui_static
+    PUBLIC
+        ${IMGUI_DIR}
+        ${IMGUI_DIR}/backends
+)
+
+target_link_libraries(imgui_static PUBLIC glfw)
+target_compile_features(imgui_static PUBLIC cxx_std_20)
+
+if(MSVC)
+    target_compile_options(imgui_static PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(imgui_static PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+find_package(OpenGL REQUIRED)
+
+add_executable(aipackager-gui
+    src/main.cpp
+)
+
+target_link_libraries(aipackager-gui
+    PRIVATE
+        aipackager_core
+        imgui_static
+        glfw
+        OpenGL::GL
+)
+
+target_compile_features(aipackager-gui PRIVATE cxx_std_20)
+
+target_include_directories(aipackager-gui
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/core/include
+)
+
+if(MSVC)
+    target_compile_options(aipackager-gui PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(aipackager-gui PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+==== END FILE: gui/CMakeLists.txt ====
+
+==== FILE: gui/src/main.cpp ====
+#include "core/Packager.hpp"
+
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
+#include <GLFW/glfw3.h>
+
+#include <array>
+#include <cstdlib>
+#include <cstddef>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace {
+
+namespace fs = std::filesystem;
+
+struct ClipboardItem {
+    std::string name;
+    std::string content;
+};
+
+struct AppState {
+    std::string droppedPath;
+    std::string outputDirectory {"ai_export"};
+    std::array<char, 2048> outputDirectoryBuffer {};
+    std::string statusMessage {"Drop a folder to start packaging."};
+    bool lastRunSucceeded {false};
+    bool isProcessing {false};
+    bool exportedToDisk {false};
+    std::size_t maxChunkSizeBytes {AIPackager::Core::ChunkManager::kDefaultChunkBytes};
+    std::vector<ClipboardItem> generatedItems;
+};
+
+void SyncOutputDirectoryBuffer(AppState& state) {
+    state.outputDirectoryBuffer.fill('\0');
+    const std::size_t maxCopy = state.outputDirectoryBuffer.size() - 1U;
+    const std::size_t length = state.outputDirectory.size() < maxCopy ? state.outputDirectory.size() : maxCopy;
+    std::memcpy(state.outputDirectoryBuffer.data(), state.outputDirectory.data(), length);
+    state.outputDirectoryBuffer[length] = '\0';
+}
+
+void ApplyDarkTheme() {
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 14.0F;
+    style.FrameRounding = 10.0F;
+    style.GrabRounding = 10.0F;
+    style.PopupRounding = 10.0F;
+    style.ScrollbarRounding = 12.0F;
+    style.TabRounding = 10.0F;
+    style.WindowBorderSize = 1.0F;
+    style.FrameBorderSize = 1.0F;
+
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4(0.10F, 0.11F, 0.13F, 1.00F);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.12F, 0.13F, 0.16F, 1.00F);
+    colors[ImGuiCol_Border] = ImVec4(0.24F, 0.27F, 0.31F, 0.90F);
+    colors[ImGuiCol_Header] = ImVec4(0.20F, 0.30F, 0.44F, 0.90F);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.24F, 0.38F, 0.55F, 0.95F);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.28F, 0.44F, 0.62F, 1.00F);
+    colors[ImGuiCol_Button] = ImVec4(0.16F, 0.34F, 0.50F, 0.90F);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.21F, 0.43F, 0.62F, 0.95F);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.17F, 0.52F, 0.39F, 1.00F);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.15F, 0.17F, 0.20F, 1.00F);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.20F, 0.25F, 0.31F, 1.00F);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.24F, 0.31F, 0.38F, 1.00F);
+    colors[ImGuiCol_Tab] = ImVec4(0.15F, 0.22F, 0.32F, 1.00F);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.22F, 0.34F, 0.48F, 1.00F);
+    colors[ImGuiCol_TabActive] = ImVec4(0.18F, 0.44F, 0.34F, 1.00F);
+}
+
+std::string BuildSuccessMessage(std::size_t chunkCount) {
+    std::ostringstream oss;
+    oss << "Packaging completed successfully. Generated " << chunkCount << " chunk(s).";
+    return oss.str();
+}
+
+bool WriteTextFile(const fs::path& filePath, std::string_view content, std::string& errorMessage) {
+    std::ofstream output(filePath, std::ios::binary);
+    if (!output.is_open()) {
+        errorMessage = "Unable to open file for writing: " + filePath.string();
+        return false;
+    }
+
+    output.write(content.data(), static_cast<std::streamsize>(content.size()));
+    if (!output.good()) {
+        errorMessage = "Write failure: " + filePath.string();
+        return false;
+    }
+
+    return true;
+}
+
+bool ExportToDisk(const fs::path& outputDir, const std::vector<ClipboardItem>& generatedItems, std::string& errorMessage) {
+    std::error_code ec;
+    fs::create_directories(outputDir, ec);
+    if (ec) {
+        errorMessage = "Failed to create output directory: " + outputDir.string() + " (" + ec.message() + ")";
+        return false;
+    }
+
+    for (const auto& item : generatedItems) {
+        if (!WriteTextFile(outputDir / item.name, item.content, errorMessage)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::string EscapeSingleQuotes(std::string text) {
+    std::string out;
+    out.reserve(text.size() + 16);
+    for (char ch : text) {
+        if (ch == '\'') {
+            out += "'\\''";
+        } else {
+            out.push_back(ch);
+        }
+    }
+    return out;
+}
+
+bool OpenInFileManager(const fs::path& pathToOpen, std::string& errorMessage) {
+    const std::string p = pathToOpen.string();
+
+#if defined(_WIN32)
+    std::string escaped;
+    escaped.reserve(p.size() + 8);
+    for (char ch : p) {
+        if (ch == '"') {
+            escaped += '\\';
+        }
+        escaped.push_back(ch);
+    }
+    const std::string cmd = "explorer \"" + escaped + "\"";
+#elif defined(__APPLE__)
+    const std::string cmd = "open '" + EscapeSingleQuotes(p) + "'";
+#else
+    const std::string cmd = "xdg-open '" + EscapeSingleQuotes(p) + "'";
+#endif
+
+    const int result = std::system(cmd.c_str());
+    if (result != 0) {
+        errorMessage = "Unable to open file manager for: " + p;
+        return false;
+    }
+
+    return true;
+}
+
+void RunPackaging(AppState& state, const fs::path& folderPath) {
+    state.isProcessing = true;
+    state.lastRunSucceeded = false;
+    state.exportedToDisk = false;
+    state.statusMessage = "Packaging in progress...";
+    state.generatedItems.clear();
+
+    AIPackager::Core::PackagerOptions options;
+    options.chunkSizeBytes = state.maxChunkSizeBytes;
+
+    AIPackager::Core::Packager packager {
+        AIPackager::Core::Scanner {},
+        AIPackager::Core::IndexBuilder {},
+        options};
+
+    std::string errorMessage;
+    auto result = packager.Build(folderPath, errorMessage);
+    if (!result.has_value()) {
+        state.statusMessage = "Error: " + errorMessage;
+        state.isProcessing = false;
+        return;
+    }
+
+    state.generatedItems.push_back(ClipboardItem {
+        .name = "INDEX.txt",
+        .content = result->indexContent
+    });
+
+    const std::size_t width = result->chunks.size() > 99U
+        ? std::to_string(result->chunks.size()).size()
+        : 2U;
+
+    for (std::size_t i = 0; i < result->chunks.size(); ++i) {
+        std::ostringstream name;
+        name << "SOURCE_part";
+        name << std::setfill('0') << std::setw(static_cast<int>(width)) << (i + 1U) << ".txt";
+
+        state.generatedItems.push_back(ClipboardItem {
+            .name = name.str(),
+            .content = result->chunks[i]
+        });
+    }
+
+    std::string exportError;
+    if (!ExportToDisk(fs::path(state.outputDirectory), state.generatedItems, exportError)) {
+        state.statusMessage = "Packaging succeeded, but export failed: " + exportError;
+        state.lastRunSucceeded = false;
+        state.exportedToDisk = false;
+        state.isProcessing = false;
+        return;
+    }
+
+    state.statusMessage = BuildSuccessMessage(result->chunks.size());
+    state.lastRunSucceeded = true;
+    state.exportedToDisk = true;
+    state.isProcessing = false;
+}
+
+void DropCallback(GLFWwindow* window, int pathCount, const char** paths) {
+    if (window == nullptr || pathCount <= 0 || paths == nullptr) {
+        return;
+    }
+
+    auto* state = static_cast<AppState*>(glfwGetWindowUserPointer(window));
+    if (state == nullptr) {
+        return;
+    }
+
+    fs::path dropped = fs::path(paths[0]);
+    state->droppedPath = dropped.string();
+
+    std::error_code ec;
+    if (!fs::exists(dropped, ec) || ec) {
+        state->statusMessage = "Error: dropped path does not exist.";
+        state->lastRunSucceeded = false;
+        state->generatedItems.clear();
+        return;
+    }
+
+    if (!fs::is_directory(dropped, ec) || ec) {
+        state->statusMessage = "Error: please drop a directory, not a file.";
+        state->lastRunSucceeded = false;
+        state->generatedItems.clear();
+        return;
+    }
+
+    state->outputDirectory = (dropped / "ai_export").string();
+    SyncOutputDirectoryBuffer(*state);
+
+    RunPackaging(*state, dropped);
+}
+
+} // namespace
+
+int main() {
+    if (!glfwInit()) {
+        return 1;
+    }
+
+    const char* glslVersion = "#version 130";
+#if defined(__APPLE__)
+    glslVersion = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#endif
+
+    GLFWwindow* window = glfwCreateWindow(1280, 800, "AI Packager - Desktop", nullptr, nullptr);
+    if (window == nullptr) {
+        glfwTerminate();
+        return 2;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    ApplyDarkTheme();
+
+    if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) {
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 3;
+    }
+
+    if (!ImGui_ImplOpenGL3_Init(glslVersion)) {
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 4;
+    }
+
+    AppState appState;
+    SyncOutputDirectoryBuffer(appState);
+    glfwSetWindowUserPointer(window, &appState);
+    glfwSetDropCallback(window, DropCallback);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::SetNextWindowPos(ImVec2(20.0F, 20.0F), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(1240.0F, 760.0F), ImGuiCond_Once);
+        ImGui::Begin("AIPackager Desktop", nullptr, ImGuiWindowFlags_NoCollapse);
+
+        if (ImGui::BeginChild("settings_panel", ImVec2(0.0F, 160.0F), true)) {
+            ImGui::TextUnformatted("Configuration");
+            ImGui::Separator();
+            ImGui::Text("Dropped folder: %s", appState.droppedPath.empty() ? "(none)" : appState.droppedPath.c_str());
+            ImGui::Text("Chunk size limit: %zu bytes", appState.maxChunkSizeBytes);
+
+            ImGui::TextUnformatted("Output Directory");
+            ImGui::SetNextItemWidth(-1.0F);
+            if (ImGui::InputText("##output_dir", appState.outputDirectoryBuffer.data(), appState.outputDirectoryBuffer.size())) {
+                appState.outputDirectory = appState.outputDirectoryBuffer.data();
+            }
+
+            if (!appState.droppedPath.empty()) {
+                if (ImGui::Button("Run Packaging")) {
+                    RunPackaging(appState, fs::path(appState.droppedPath));
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Reset Output to ai_export")) {
+                    appState.outputDirectory = (fs::path(appState.droppedPath) / "ai_export").string();
+                    SyncOutputDirectoryBuffer(appState);
+                }
+            }
+        }
+        ImGui::EndChild();
+
+        if (ImGui::BeginChild("status_panel", ImVec2(0.0F, 120.0F), true)) {
+            ImGui::TextUnformatted("Drop Zone / Status");
+            ImGui::Separator();
+            ImGui::TextUnformatted("Drag and drop a folder onto this window to package automatically.");
+
+            if (appState.isProcessing) {
+                ImGui::TextColored(ImVec4(0.46F, 0.75F, 1.00F, 1.00F), "Status: Processing...");
+            } else {
+                const ImVec4 statusColor = appState.lastRunSucceeded
+                    ? ImVec4(0.34F, 0.82F, 0.46F, 1.00F)
+                    : ImVec4(0.94F, 0.49F, 0.42F, 1.00F);
+                ImGui::TextColored(statusColor, "Status: %s", appState.statusMessage.c_str());
+            }
+
+            if (appState.lastRunSucceeded && appState.exportedToDisk) {
+                ImGui::Text("Export folder: %s", appState.outputDirectory.c_str());
+                if (ImGui::Button("Open Export Folder")) {
+                    std::string openError;
+                    if (!OpenInFileManager(fs::path(appState.outputDirectory), openError)) {
+                        appState.statusMessage = "Error: " + openError;
+                        appState.lastRunSucceeded = false;
+                    }
+                }
+            }
+        }
+        ImGui::EndChild();
+
+        if (ImGui::BeginChild("files_panel", ImVec2(0.0F, 0.0F), true)) {
+            ImGui::Text("Generated Files (%zu)", appState.generatedItems.size());
+            ImGui::Separator();
+
+            if (ImGui::BeginTable("generated_table", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY, ImVec2(0.0F, 0.0F))) {
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch, 0.45F);
+            ImGui::TableSetupColumn("Size (bytes)", ImGuiTableColumnFlags_WidthStretch, 0.20F);
+            ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthStretch, 0.35F);
+            ImGui::TableHeadersRow();
+
+            for (std::size_t i = 0; i < appState.generatedItems.size(); ++i) {
+                const ClipboardItem& item = appState.generatedItems[i];
+
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::TextUnformatted(item.name.c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%zu", item.content.size());
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::PushID(static_cast<int>(i));
+                if (ImGui::Button("Copy to Clipboard")) {
+                    ImGui::SetClipboardText(item.content.c_str());
+                }
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+        }
+        ImGui::EndChild();
+
+        ImGui::End();
+
+        ImGui::Render();
+        int displayWidth = 0;
+        int displayHeight = 0;
+        glfwGetFramebufferSize(window, &displayWidth, &displayHeight);
+        glViewport(0, 0, displayWidth, displayHeight);
+        glClearColor(0.08F, 0.09F, 0.11F, 1.00F);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
+}
+
+==== END FILE: gui/src/main.cpp ====
+
+==== FILE: izli_export.py ====
+import os
+
+# Ayarlar
+MAX_BYTES = 400 * 1024  # 400 KB
+OUT_DIR = "ai_export"
+IGNORE_DIRS = {'.git', 'build', 'node_modules', 'out', 'bin', 'obj', '.vscode', 'ai_export'}
+ALLOWED_EXTS = {'.cpp', '.hpp', '.h', '.c', '.txt', '.md', '.cmake'}
+
+def is_ignored(root_path):
+    parts = root_path.replace('\\', '/').split('/')
+    for p in parts:
+        if p in IGNORE_DIRS:
+            return True
+    return False
+
+def main():
+    os.makedirs(OUT_DIR, exist_ok=True)
+    
+    index_lines = ["=== PROJE DOSYA AĞACI VE İNDEKS ===\n\n"]
+    
+    part_num = 1
+    current_text = ""
+    current_bytes = 0
+    
+    def save_part():
+        nonlocal part_num, current_text, current_bytes
+        if current_bytes > 0:
+            file_name = f"SOURCE_part{part_num:02d}.txt"
+            with open(os.path.join(OUT_DIR, file_name), "w", encoding="utf-8") as f:
+                f.write(current_text)
+            print(f"Oluşturuldu: {file_name} ({current_bytes // 1024} KB)")
+            part_num += 1
+            current_text = ""
+            current_bytes = 0
+
+    # Dosyaları tara
+    for root, dirs, files in os.walk("."):
+        if is_ignored(root):
+            continue
+            
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            if ext not in ALLOWED_EXTS:
+                continue
+                
+            file_path = os.path.join(root, file)
+            rel_path = os.path.relpath(file_path, ".").replace('\\', '/')
+            
+            # İndekse ekle
+            index_lines.append(f"- {rel_path}\n")
+            
+            # İçeriği oku
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+            except Exception:
+                continue # Okunamayan dosyayı atla
+                
+            block = f"\n{'='*60}\nFILE: {rel_path}\n{'='*60}\n{content}\n"
+            block_bytes = len(block.encode('utf-8'))
+            
+            # Sınırı aşıyorsa mevcut part'ı kaydet
+            if current_bytes + block_bytes > MAX_BYTES and current_bytes > 0:
+                save_part()
+                
+            current_text += block
+            current_bytes += block_bytes
+
+    # Kalanı kaydet
+    save_part()
+    
+    # İndeksi kaydet
+    with open(os.path.join(OUT_DIR, "INDEX.txt"), "w", encoding="utf-8") as f:
+        f.writelines(index_lines)
+    print("İşlem tamam! Çıktılar 'ai_export' klasöründe.")
+
+if __name__ == "__main__":
+    main()
+==== END FILE: izli_export.py ====
+

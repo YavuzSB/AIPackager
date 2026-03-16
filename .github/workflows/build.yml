@@ -1,0 +1,76 @@
+name: Cross-Platform Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libgl1-mesa-dev
+
+      - name: Configure (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build targets (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: cmake --build build --target aipackager-cli aipackager-gui --config Release --parallel
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build
+
+      - name: Build targets (Windows)
+        if: runner.os == 'Windows'
+        run: cmake --build build --target aipackager-cli aipackager-gui --config Release --parallel
+
+      - name: Collect binaries (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cp "build/cli/aipackager-cli" "artifacts/" 
+          cp "build/gui/aipackager-gui" "artifacts/"
+
+      - name: Collect binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          Copy-Item "build/cli/Release/aipackager-cli.exe" "artifacts/"
+          Copy-Item "build/gui/Release/aipackager-gui.exe" "artifacts/"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aipackager-${{ matrix.os }}
+          path: artifacts/*
+          if-no-files-found: error

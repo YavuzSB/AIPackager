@@ -1,0 +1,87 @@
+# ninja log v7
+2	907	1773630822040000000	core/CMakeFiles/aipackager_core.dir/src/ChunkManager.cpp.o	d51444095db12cec
+2	1308	1773630915030000000	cli/CMakeFiles/aipackager-cli.dir/src/main.cpp.o	923ca456a12687be
+3	1768	1773630822040000000	core/CMakeFiles/aipackager_core.dir/src/IndexBuilder.cpp.o	bee668da7f854573
+3	1782	1773630822040000000	core/CMakeFiles/aipackager_core.dir/src/Packager.cpp.o	91c64345857b0a84
+2	1827	1773630822040000000	core/CMakeFiles/aipackager_core.dir/src/Scanner.cpp.o	6b2e97926af2e7b4
+1827	1920	1773630823860000000	core/libaipackager_core.a	dbaa39cf01d97474
+1308	1598	1773630916340000000	cli/aipackager-cli	93d2e2efc735374e
+5	16	1773631222740000000	_deps/glfw-build/src/viewporter-client-protocol.h	a439c2d4daf3a97f
+5	16	1773631222740000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/viewporter-client-protocol.h	a439c2d4daf3a97f
+5	18	1773631222750000000	_deps/glfw-build/src/viewporter-client-protocol-code.h	1769c23a12e00130
+5	18	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/viewporter-client-protocol-code.h	1769c23a12e00130
+7	18	1773631222750000000	_deps/glfw-build/src/idle-inhibit-unstable-v1-client-protocol.h	2b9ac97f132ca12f
+7	18	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/idle-inhibit-unstable-v1-client-protocol.h	2b9ac97f132ca12f
+8	20	1773631222750000000	_deps/glfw-build/src/pointer-constraints-unstable-v1-client-protocol-code.h	af7784f3c3df0be2
+8	20	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/pointer-constraints-unstable-v1-client-protocol-code.h	af7784f3c3df0be2
+7	20	1773631222750000000	_deps/glfw-build/src/idle-inhibit-unstable-v1-client-protocol-code.h	e08b85da4d78c7a7
+7	20	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/idle-inhibit-unstable-v1-client-protocol-code.h	e08b85da4d78c7a7
+6	20	1773631222750000000	_deps/glfw-build/src/xdg-shell-client-protocol-code.h	3d597b5de8c99299
+6	20	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-shell-client-protocol-code.h	3d597b5de8c99299
+8	21	1773631222750000000	_deps/glfw-build/src/relative-pointer-unstable-v1-client-protocol.h	7577d2a353f9542b
+8	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/relative-pointer-unstable-v1-client-protocol.h	7577d2a353f9542b
+6	21	1773631222750000000	_deps/glfw-build/src/xdg-shell-client-protocol.h	a490538be336b5a4
+6	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-shell-client-protocol.h	a490538be336b5a4
+9	21	1773631222750000000	_deps/glfw-build/src/fractional-scale-v1-client-protocol-code.h	566931d3667f67
+9	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/fractional-scale-v1-client-protocol-code.h	566931d3667f67
+7	21	1773631222750000000	_deps/glfw-build/src/pointer-constraints-unstable-v1-client-protocol.h	b4ec96e64ca9f0bf
+7	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/pointer-constraints-unstable-v1-client-protocol.h	b4ec96e64ca9f0bf
+9	21	1773631222750000000	_deps/glfw-build/src/relative-pointer-unstable-v1-client-protocol-code.h	65d75bb7b9652d9a
+9	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/relative-pointer-unstable-v1-client-protocol-code.h	65d75bb7b9652d9a
+10	21	1773631222750000000	_deps/glfw-build/src/xdg-activation-v1-client-protocol-code.h	38c2eb437a2b7943
+10	21	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-activation-v1-client-protocol-code.h	38c2eb437a2b7943
+10	23	1773631222750000000	_deps/glfw-build/src/xdg-activation-v1-client-protocol.h	f4ecbdd3dc3188fc
+10	23	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-activation-v1-client-protocol.h	f4ecbdd3dc3188fc
+10	23	1773631222750000000	_deps/glfw-build/src/xdg-decoration-unstable-v1-client-protocol.h	a4901311aa540f29
+10	23	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-decoration-unstable-v1-client-protocol.h	a4901311aa540f29
+9	24	1773631222750000000	_deps/glfw-build/src/fractional-scale-v1-client-protocol.h	6b49c9dba3ca151d
+9	24	1773631222750000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/fractional-scale-v1-client-protocol.h	6b49c9dba3ca151d
+11	27	1773631222760000000	_deps/glfw-build/src/xdg-decoration-unstable-v1-client-protocol-code.h	aa316f5857a246f5
+11	27	1773631222760000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/xdg-decoration-unstable-v1-client-protocol-code.h	aa316f5857a246f5
+4	28	1773631222760000000	_deps/glfw-build/src/wayland-client-protocol.h	4b77a04a6d43d56b
+4	28	1773631222760000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/wayland-client-protocol.h	4b77a04a6d43d56b
+4	28	1773631222760000000	_deps/glfw-build/src/wayland-client-protocol-code.h	53f70151ebef887f
+4	28	1773631222760000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/wayland-client-protocol-code.h	53f70151ebef887f
+33	261	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/posix_module.c.o	8977e99d39db103c
+34	264	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/posix_thread.c.o	4f41f0ffacd0b280
+36	290	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/xkb_unicode.c.o	4a1d1c86da683363
+33	301	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/null_joystick.c.o	4516d5b9255dc7d4
+47	307	1773631222780000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/posix_poll.c.o	232aa392cdf2d33e
+32	308	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/null_init.c.o	db65cdf8fa00d653
+30	318	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/platform.c.o	2dc5da4cde293843
+34	325	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/posix_time.c.o	726e661fe58b6bfb
+30	345	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/vulkan.c.o	a73e80f7eddf47f3
+32	354	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/null_monitor.c.o	80840b6552fc4f9f
+40	354	1773631222770000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/wl_monitor.c.o	3d4eac69da0890d6
+38	364	1773631222770000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/glx_context.c.o	2c3919d8e9af8330
+42	370	1773631222770000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/linux_joystick.c.o	57a4d7aac67a4530
+31	370	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/egl_context.c.o	de0e023d38b28c12
+33	374	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/null_window.c.o	b3dafae216da8592
+36	382	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/x11_monitor.c.o	95c6d65e66f36b10
+30	383	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/monitor.c.o	8cf9569bba1580d2
+32	385	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/osmesa_context.c.o	af5aaa6bf40cfbdf
+29	391	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/init.c.o	e0dd62489125a7e9
+28	397	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/context.c.o	a842db52a6b425d5
+31	440	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/window.c.o	69b0dad4d7d488bd
+34	489	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/x11_init.c.o	7dcdbf24677d381e
+38	490	1773631222770000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/wl_init.c.o	93eab0f11a345d2b
+29	501	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/input.c.o	ac7948a5b6b3a585
+290	572	1773631223020000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/backends/imgui_impl_opengl3.cpp.o	e3510ea4c671e81c
+264	582	1773631222990000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/backends/imgui_impl_glfw.cpp.o	2fe631390dd1bd9f
+36	646	1773631222760000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/x11_window.c.o	9a068bf5f40b5254
+41	839	1773631222770000000	_deps/glfw-build/src/CMakeFiles/glfw.dir/wl_window.c.o	267b7fe7c0d042fa
+839	951	1773631223570000000	_deps/glfw-build/src/libglfw3.a	3e0142d2e068c2e8
+301	1932	1773631223030000000	gui/CMakeFiles/aipackager-gui.dir/src/main.cpp.o	4142f6f78021243c
+261	2167	1773631222990000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/imgui_demo.cpp.o	2c48eeb967370048
+53	2453	1773631222780000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/imgui_tables.cpp.o	2bf951c1a3a9c135
+52	2863	1773631222780000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/imgui_draw.cpp.o	5abab9eaac7c0aa5
+53	3401	1773631222780000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/imgui_widgets.cpp.o	658a1eef6b959645
+47	3966	1773631222780000000	gui/CMakeFiles/imgui_static.dir/__/_deps/imgui-src/imgui.cpp.o	716721de860917e7
+3966	4063	1773631226690000000	gui/libimgui_static.a	56b3b0c78426a41a
+4063	4431	1773631226790000000	gui/aipackager-gui	542ab48d2af923c1
+7	1611	1773631331670000000	gui/CMakeFiles/aipackager-gui.dir/src/main.cpp.o	4142f6f78021243c
+1611	1999	1773631333270000000	gui/aipackager-gui	542ab48d2af923c1
+7	1818	1773631765270000000	gui/CMakeFiles/aipackager-gui.dir/src/main.cpp.o	4142f6f78021243c
+1818	2210	1773631767080000000	gui/aipackager-gui	542ab48d2af923c1
+4	1977	1773632242560000000	gui/CMakeFiles/aipackager-gui.dir/src/main.cpp.o	4142f6f78021243c
+1977	2319	1773632244530000000	gui/aipackager-gui	542ab48d2af923c1

@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/core/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/cli/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/gui/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/src/cmake_install.cmake",
+		"/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-build/docs/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
