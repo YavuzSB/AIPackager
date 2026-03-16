@@ -4,6 +4,15 @@ build*/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+build.ninja
+compile_commands.json
+.ninja_log
+.ninja_deps
+*.cmake
+CMakeLists.txt.user
+CMakeSettings.json
+CMakePresets.json
+CMakeUserPresets.json
 Makefile
 *.o
 *.obj

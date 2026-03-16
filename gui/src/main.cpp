@@ -867,3 +867,12 @@ int main() {
 
     return 0;
 }
+
+#ifdef _WIN32
+#include <windows.h>
+// Windows GUI uygulamaları için giriş noktası köprüsü
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+    return main();
+}
+#endif
+}

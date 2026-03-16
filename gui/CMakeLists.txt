@@ -45,11 +45,14 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+
 add_executable(aipackager-gui
     src/main.cpp
 )
 
+# WIN32 yapılandırması: terminal açılmasın
 if(WIN32)
+    # Uygulamayı GUI olarak işaretle (Terminali kapatır)
     set_target_properties(aipackager-gui PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 

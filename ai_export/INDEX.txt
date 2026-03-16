@@ -3,18 +3,19 @@
 Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
 
 ## Summary
-- Included files: 19
+- Included files: 20
 - Skipped items: 3
-- Total included bytes: 101312
+- Total included bytes: 102040
 - Detected profile: C++
 
 ## Included Files (Tree-like)
-  - .github/.gitignore (6 B)
   - .github/copilot-instructions.md (1213 B)
     - .github/workflows/build.yml (2232 B)
+- .gitignore (412 B)
 - CMakeLists.txt (248 B)
 - LICENSE (1080 B)
 - README.md (2578 B)
+- VERSION (5 B)
   - cli/CMakeLists.txt (354 B)
     - cli/src/main.cpp (5363 B)
   - core/CMakeLists.txt (460 B)
@@ -26,7 +27,7 @@ Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
     - core/src/IndexBuilder.cpp (5984 B)
     - core/src/Packager.cpp (4357 B)
     - core/src/Scanner.cpp (29718 B)
-  - gui/CMakeLists.txt (1636 B)
+  - gui/CMakeLists.txt (1953 B)
     - gui/src/main.cpp (31339 B)
 
 ## Large Files (Top 10)
@@ -44,5 +45,5 @@ Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
 ## Skipped Items
 - .git | reason=ExcludedDirectory | details=Directory excluded by scanner options
 - ai_export | reason=ExcludedDirectory | details=Directory excluded by scanner options
-- build | reason=ExcludedDirectory | details=Directory excluded by scanner options
+- build | reason=ExcludedDirectory | details=Directory excluded by .gitignore
 

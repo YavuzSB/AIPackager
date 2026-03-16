@@ -4,18 +4,19 @@
 Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
 
 ## Summary
-- Included files: 19
+- Included files: 20
 - Skipped items: 3
-- Total included bytes: 101312
+- Total included bytes: 102040
 - Detected profile: C++
 
 ## Included Files (Tree-like)
-  - .github/.gitignore (6 B)
   - .github/copilot-instructions.md (1213 B)
     - .github/workflows/build.yml (2232 B)
+- .gitignore (412 B)
 - CMakeLists.txt (248 B)
 - LICENSE (1080 B)
 - README.md (2578 B)
+- VERSION (5 B)
   - cli/CMakeLists.txt (354 B)
     - cli/src/main.cpp (5363 B)
   - core/CMakeLists.txt (460 B)
@@ -27,7 +28,7 @@ Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
     - core/src/IndexBuilder.cpp (5984 B)
     - core/src/Packager.cpp (4357 B)
     - core/src/Scanner.cpp (29718 B)
-  - gui/CMakeLists.txt (1636 B)
+  - gui/CMakeLists.txt (1953 B)
     - gui/src/main.cpp (31339 B)
 
 ## Large Files (Top 10)
@@ -45,13 +46,9 @@ Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
 ## Skipped Items
 - .git | reason=ExcludedDirectory | details=Directory excluded by scanner options
 - ai_export | reason=ExcludedDirectory | details=Directory excluded by scanner options
-- build | reason=ExcludedDirectory | details=Directory excluded by scanner options
+- build | reason=ExcludedDirectory | details=Directory excluded by .gitignore
 
 ==== END FILE: INDEX.txt ====
-
-==== FILE: .github/.gitignore ====
-build/
-==== END FILE: .github/.gitignore ====
 
 ==== FILE: .github/copilot-instructions.md ====
 Sen kıdemli bir C++ (C++20) yazılım mimarısın. Amacımız, projeleri AI asistanları için 400KB'lık metin parçalarına bölen bir aracın sadece Core (Çekirdek) kütüphanesini yazmak. Arayüz (GUI) veya CLI kodu YAZMAYACAKSIN.
@@ -159,6 +156,46 @@ jobs:
 
 ==== END FILE: .github/workflows/build.yml ====
 
+==== FILE: .gitignore ====
+# Derleme çıktıları ve bağımlılıklar
+build/
+build*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build.ninja
+compile_commands.json
+.ninja_log
+.ninja_deps
+*.cmake
+CMakeLists.txt.user
+CMakeSettings.json
+CMakePresets.json
+CMakeUserPresets.json
+Makefile
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.pch
+*.pdb
+*.ilk
+*.log
+*.tmp
+*.user
+*.DS_Store
+*.swp
+*.sln
+*.vcxproj*
+# Bağımlılık kaynakları
+_deps/
+
+==== END FILE: .gitignore ====
+
 ==== FILE: CMakeLists.txt ====
 cmake_minimum_required(VERSION 3.20)
 
@@ -246,6 +283,10 @@ No installation required. Download the pre-compiled binary for your operating sy
 ./aipackager-cli --dir ./my_project --out ./export_folder --max-size 400000
 
 ==== END FILE: README.md ====
+
+==== FILE: VERSION ====
+1.0.2
+==== END FILE: VERSION ====
 
 ==== FILE: cli/CMakeLists.txt ====
 add_executable(aipackager-cli
@@ -2255,12 +2296,20 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+
 add_executable(aipackager-gui
     src/main.cpp
 )
 
+# WIN32 yapılandırması: terminal açılmasın ve giriş noktası main olsun
 if(WIN32)
+    # Uygulamayı GUI olarak işaretle (Terminali kapatır)
     set_target_properties(aipackager-gui PROPERTIES WIN32_EXECUTABLE TRUE)
+
+    # Derleyiciye ana giriş noktasının standart "main" olduğunu söyle
+    if(MSVC)
+        target_link_options(aipackager-gui PRIVATE "/ENTRY:mainCRTStartup")
+    endif()
 endif()
 
 target_link_libraries(aipackager-gui
