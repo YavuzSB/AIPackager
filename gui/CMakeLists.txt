@@ -49,6 +49,10 @@ add_executable(aipackager-gui
     src/main.cpp
 )
 
+if(WIN32)
+    set_target_properties(aipackager-gui PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 target_link_libraries(aipackager-gui
     PRIVATE
         aipackager_core
