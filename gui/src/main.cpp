@@ -21,6 +21,10 @@
 #include <unordered_set>
 #include <vector>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #if __has_include("IconsFontAwesome6.h")
 #include "IconsFontAwesome6.h"
 #define AIPACKAGER_HAS_FA_ICONS 1
@@ -869,10 +873,9 @@ int main() {
 }
 
 #ifdef _WIN32
-#include <windows.h>
 // Windows GUI uygulamaları için giriş noktası köprüsü
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-    return main();
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+    return ::main();
 }
 #endif
-}
+
