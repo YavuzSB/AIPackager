@@ -19,6 +19,25 @@ void AppendLine(std::string& out, const std::string& line, const std::string& li
     out.append(lineEnding);
 }
 
+[[nodiscard]] std::string ProfileName(LanguageProfile profile) {
+    switch (profile) {
+    case LanguageProfile::All:
+        return "All";
+    case LanguageProfile::Cpp:
+        return "C++";
+    case LanguageProfile::Web:
+        return "Web/Node.js";
+    case LanguageProfile::Rust:
+        return "Rust";
+    case LanguageProfile::Mobile:
+        return "Mobile (Flutter/RN)";
+    case LanguageProfile::Java:
+        return "Java";
+    default:
+        return "All";
+    }
+}
+
 } // namespace
 
 IndexBuilder::IndexBuilder(IndexBuildOptions options) noexcept
@@ -51,6 +70,7 @@ std::string IndexBuilder::Build(const ScanReport& report) const {
         AppendLine(out, "- Included files: " + std::to_string(included.size()), options_.lineEnding);
         AppendLine(out, "- Skipped items: " + std::to_string(skipped.size()), options_.lineEnding);
         AppendLine(out, "- Total included bytes: " + std::to_string(report.totalIncludedBytes), options_.lineEnding);
+        AppendLine(out, "- Detected profile: " + ProfileName(report.detectedProfile), options_.lineEnding);
         AppendLine(out, "", options_.lineEnding);
     }
 
@@ -67,6 +87,31 @@ std::string IndexBuilder::Build(const ScanReport& report) const {
                 line += GenericPath(item.relativePath);
                 line += " (";
                 line += std::to_string(item.sizeBytes);
+                line += " B)";
+                AppendLine(out, line, options_.lineEnding);
+            }
+        }
+
+        AppendLine(out, "", options_.lineEnding);
+    }
+
+    if (options_.includeLargeFilesSection) {
+        AppendLine(out, "## Large Files (Top 10)", options_.lineEnding);
+
+        if (included.empty()) {
+            AppendLine(out, "- (none)", options_.lineEnding);
+        } else {
+            std::vector<ScannedFile> bySize = included;
+            std::ranges::sort(bySize, [](const ScannedFile& lhs, const ScannedFile& rhs) {
+                return lhs.sizeBytes > rhs.sizeBytes;
+            });
+
+            const std::size_t count = std::min<std::size_t>(10U, bySize.size());
+            for (std::size_t i = 0; i < count; ++i) {
+                std::string line = "- ";
+                line += GenericPath(bySize[i].relativePath);
+                line += " (";
+                line += std::to_string(bySize[i].sizeBytes);
                 line += " B)";
                 AppendLine(out, line, options_.lineEnding);
             }
@@ -106,6 +151,10 @@ std::string IndexBuilder::ToString(SkipReason reason) {
         return "ExcludedDirectory";
     case SkipReason::ExcludedExtension:
         return "ExcludedExtension";
+    case SkipReason::BlacklistedFilename:
+        return "BlacklistedFilename";
+    case SkipReason::TooLarge:
+        return "TooLarge";
     case SkipReason::BinaryHeuristic:
         return "BinaryHeuristic";
     case SkipReason::PermissionDenied:

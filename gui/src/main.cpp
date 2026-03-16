@@ -9,6 +9,7 @@
 #include <array>
 #include <cstdlib>
 #include <cstddef>
+#include <cctype>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -17,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #if __has_include("IconsFontAwesome6.h")
@@ -31,16 +33,71 @@
 #define ICON_FA_GEAR "[CFG]"
 #define ICON_FA_CIRCLE_CHECK "[OK]"
 #define ICON_FA_TRIANGLE_EXCLAMATION "[WARN]"
+#define ICON_FA_CODE "[CODE]"
+#define ICON_FA_CODE_BRANCH "[BRANCH]"
+#define ICON_FA_FILE_LINES "[FILE]"
+#define ICON_FA_DATABASE "[DATA]"
+#define ICON_FA_GLOBE "[WEB]"
 #endif
 
 namespace {
 
 namespace fs = std::filesystem;
-
 struct ClipboardItem {
     std::string name;
     std::string content;
 };
+
+
+using LanguageProfile = AIPackager::Core::LanguageProfile;
+
+enum class GuiProfile {
+    AutoDetect = -1,
+    All = 0,
+    Cpp = 1,
+    Web = 2,
+    Rust = 3,
+    Mobile = 4,
+    Java = 5
+};
+
+
+const char* ProfileDisplayName(LanguageProfile profile) {
+    switch (profile) {
+    case LanguageProfile::All:    return "All";
+    case LanguageProfile::Cpp:    return "C++";
+    case LanguageProfile::Web:    return "Web/Node.js";
+    case LanguageProfile::Rust:   return "Rust";
+    case LanguageProfile::Mobile: return "Mobile (Flutter/RN)";
+    case LanguageProfile::Java:   return "Java";
+    default:                     return "All";
+    }
+}
+
+const char* GuiProfileDisplayName(GuiProfile profile) {
+    switch (profile) {
+    case GuiProfile::AutoDetect: return "Auto-Detect";
+    case GuiProfile::All:        return "All";
+    case GuiProfile::Cpp:        return "C++";
+    case GuiProfile::Web:        return "Web/Node.js";
+    case GuiProfile::Rust:       return "Rust";
+    case GuiProfile::Mobile:     return "Mobile (Flutter/RN)";
+    case GuiProfile::Java:       return "Java";
+    default:                     return "All";
+    }
+}
+
+LanguageProfile GuiToCoreProfile(GuiProfile guiProfile) {
+    switch (guiProfile) {
+    case GuiProfile::All:    return LanguageProfile::All;
+    case GuiProfile::Cpp:    return LanguageProfile::Cpp;
+    case GuiProfile::Web:    return LanguageProfile::Web;
+    case GuiProfile::Rust:   return LanguageProfile::Rust;
+    case GuiProfile::Mobile: return LanguageProfile::Mobile;
+    case GuiProfile::Java:   return LanguageProfile::Java;
+    default:                 return LanguageProfile::All;
+    }
+}
 
 struct AppState {
     std::string droppedPath;
@@ -50,9 +107,143 @@ struct AppState {
     bool lastRunSucceeded {false};
     bool isProcessing {false};
     bool exportedToDisk {false};
+    GuiProfile guiProfile {GuiProfile::AutoDetect};
+    LanguageProfile languageProfile {LanguageProfile::All};
+    std::optional<LanguageProfile> detectedProfile;
     std::size_t maxChunkSizeBytes {AIPackager::Core::ChunkManager::kDefaultChunkBytes};
+    int maxSingleFileSizeKb {500};
     std::vector<ClipboardItem> generatedItems;
+    std::vector<AIPackager::Core::SkippedItem> skippedItems;
+    std::unordered_set<std::filesystem::path> manualIncludePaths;
 };
+
+std::filesystem::path NormalizePath(const std::filesystem::path& path) {
+    std::error_code ec;
+    const fs::path absolute = fs::absolute(path, ec);
+    if (ec) {
+        return path.lexically_normal();
+    }
+
+    const fs::path weaklyCanonical = fs::weakly_canonical(absolute, ec);
+    if (ec) {
+        return absolute.lexically_normal();
+    }
+
+    return weaklyCanonical;
+}
+
+const char* ToDisplayReason(AIPackager::Core::SkipReason reason) {
+    using AIPackager::Core::SkipReason;
+
+    switch (reason) {
+    case SkipReason::ExcludedDirectory:
+        return "Excluded directory";
+    case SkipReason::ExcludedExtension:
+        return "Excluded extension";
+    case SkipReason::BlacklistedFilename:
+        return "Blacklisted filename";
+    case SkipReason::TooLarge:
+        return "File too large";
+    case SkipReason::BinaryHeuristic:
+        return "Binary heuristic";
+    case SkipReason::PermissionDenied:
+        return "Permission denied";
+    case SkipReason::NotRegularFile:
+        return "Not regular file";
+    case SkipReason::SymlinkSkipped:
+        return "Symlink skipped";
+    case SkipReason::FilesystemError:
+        return "Filesystem error";
+    default:
+        return "Unknown";
+    }
+}
+
+std::string ToLowerAscii(std::string_view value) {
+    std::string lowered;
+    lowered.reserve(value.size());
+    for (const char ch : value) {
+        lowered.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+    }
+    return lowered;
+}
+
+const char* IconForExtension(std::string_view extension) {
+    const std::string lowered = ToLowerAscii(extension);
+
+    if (lowered == ".cpp" || lowered == ".hpp" || lowered == ".c" || lowered == ".h" ||
+        lowered == ".cc" || lowered == ".cxx" || lowered == ".ixx") {
+        return ICON_FA_CODE;
+    }
+
+    if (lowered == ".py" || lowered == ".rs" || lowered == ".go" || lowered == ".java" ||
+        lowered == ".cs" || lowered == ".rb" || lowered == ".php" || lowered == ".kt" ||
+        lowered == ".swift" || lowered == ".dart") {
+        return ICON_FA_CODE_BRANCH;
+    }
+
+    if (lowered == ".md" || lowered == ".txt" || lowered == ".rst" || lowered == ".log" ||
+        lowered == ".env") {
+        return ICON_FA_FILE_LINES;
+    }
+
+    if (lowered == ".json" || lowered == ".yml" || lowered == ".yaml" || lowered == ".toml" ||
+        lowered == ".xml" || lowered == ".ini" || lowered == ".cfg" || lowered == ".conf" ||
+        lowered == ".properties" || lowered == ".sql" || lowered == ".prisma" || lowered == ".graphql") {
+        return ICON_FA_DATABASE;
+    }
+
+    if (lowered == ".html" || lowered == ".css" || lowered == ".scss" || lowered == ".js" ||
+        lowered == ".ts" || lowered == ".jsx" || lowered == ".tsx" || lowered == ".vue") {
+        return ICON_FA_GLOBE;
+    }
+
+    return ICON_FA_FILE_LINES;
+}
+
+const char* IconForPath(const fs::path& path) {
+    return IconForExtension(path.extension().string());
+}
+
+void DrawIconLabel(const char* icon, std::string_view label) {
+    ImGui::TextUnformatted(icon);
+    ImGui::SameLine(0.0F, 5.0F);
+    ImGui::TextUnformatted(label.data(), label.data() + label.size());
+}
+
+AIPackager::Core::ScannerOptions BuildScannerOptions(
+    const AppState& state,
+    LanguageProfile languageProfile) {
+    AIPackager::Core::ScannerOptions scannerOptions = AIPackager::Core::ScannerOptions::Default();
+    scannerOptions.manualIncludePaths = state.manualIncludePaths;
+    scannerOptions.languageProfile = languageProfile;
+
+    const int maxSingleFileSizeKb = state.maxSingleFileSizeKb < 1 ? 1 : state.maxSingleFileSizeKb;
+    scannerOptions.maxSingleFileSize =
+        static_cast<std::uintmax_t>(maxSingleFileSizeKb) * 1024U;
+    return scannerOptions;
+}
+
+std::optional<LanguageProfile> ResolveLanguageProfile(
+    AppState& state,
+    const fs::path& folderPath,
+    std::string& errorMessage) {
+    state.detectedProfile.reset();
+
+    if (state.guiProfile != GuiProfile::AutoDetect) {
+        return GuiToCoreProfile(state.guiProfile);
+    }
+
+    auto scannerOptions = BuildScannerOptions(state, LanguageProfile::All);
+    AIPackager::Core::Scanner scanner {std::move(scannerOptions)};
+    auto scanReport = scanner.Scan(folderPath, errorMessage);
+    if (!scanReport.has_value()) {
+        return std::nullopt;
+    }
+
+    state.detectedProfile = scanReport->detectedProfile;
+    return scanReport->detectedProfile;
+}
 
 void SyncOutputDirectoryBuffer(AppState& state) {
     state.outputDirectoryBuffer.fill('\0');
@@ -250,22 +441,37 @@ void RunPackaging(AppState& state, const fs::path& folderPath) {
     state.exportedToDisk = false;
     state.statusMessage = "Packaging in progress...";
     state.generatedItems.clear();
+    state.skippedItems.clear();
+
+    std::string errorMessage;
+    const auto resolvedProfile = ResolveLanguageProfile(state, folderPath, errorMessage);
+    if (!resolvedProfile.has_value()) {
+        state.statusMessage = "Error: " + errorMessage;
+        state.isProcessing = false;
+        return;
+    }
+
+    state.languageProfile = *resolvedProfile;
+
+    AIPackager::Core::ScannerOptions scannerOptions =
+        BuildScannerOptions(state, state.languageProfile);
 
     AIPackager::Core::PackagerOptions options;
     options.chunkSizeBytes = state.maxChunkSizeBytes;
 
     AIPackager::Core::Packager packager {
-        AIPackager::Core::Scanner {},
+        AIPackager::Core::Scanner {std::move(scannerOptions)},
         AIPackager::Core::IndexBuilder {},
         options};
 
-    std::string errorMessage;
     auto result = packager.Build(folderPath, errorMessage);
     if (!result.has_value()) {
         state.statusMessage = "Error: " + errorMessage;
         state.isProcessing = false;
         return;
     }
+
+    state.skippedItems = result->scanReport.skippedItems;
 
     state.generatedItems.push_back(ClipboardItem {
         .name = "INDEX.txt",
@@ -314,12 +520,15 @@ void DropCallback(GLFWwindow* window, int pathCount, const char** paths) {
 
     fs::path dropped = fs::path(paths[0]);
     state->droppedPath = dropped.string();
+    state->manualIncludePaths.clear();
+    state->skippedItems.clear();
 
     std::error_code ec;
     if (!fs::exists(dropped, ec) || ec) {
         state->statusMessage = "Error: dropped path does not exist.";
         state->lastRunSucceeded = false;
         state->generatedItems.clear();
+        state->skippedItems.clear();
         return;
     }
 
@@ -327,6 +536,7 @@ void DropCallback(GLFWwindow* window, int pathCount, const char** paths) {
         state->statusMessage = "Error: please drop a directory, not a file.";
         state->lastRunSucceeded = false;
         state->generatedItems.clear();
+        state->skippedItems.clear();
         return;
     }
 
@@ -424,12 +634,35 @@ int main() {
             }
 
             ImGui::Spacing();
+            ImGui::TextUnformatted("Project Type");
+            ImGui::SetNextItemWidth(-1.0F);
+
+            const char* profileItems[] = {"Auto-Detect", "All", "C++", "Web/Node.js", "Rust", "Mobile (Flutter/RN)", "Java"};
+            int profileIndex = static_cast<int>(appState.guiProfile) + 1; // AutoDetect = -1, All = 0, ...
+            if (ImGui::Combo("##language_profile", &profileIndex, profileItems, IM_ARRAYSIZE(profileItems))) {
+                appState.guiProfile = static_cast<GuiProfile>(profileIndex - 1);
+                if (!appState.droppedPath.empty()) {
+                    RunPackaging(appState, fs::path(appState.droppedPath));
+                }
+            }
+            ImGui::TextDisabled("Selected: %s", GuiProfileDisplayName(appState.guiProfile));
+            ImGui::TextDisabled("Current: %s", ProfileDisplayName(appState.languageProfile));
+
+            ImGui::Spacing();
             ImGui::TextUnformatted("Output Directory");
             ImGui::SetNextItemWidth(-1.0F);
             if (ImGui::InputText("##output_dir",
                     appState.outputDirectoryBuffer.data(),
                     appState.outputDirectoryBuffer.size())) {
                 appState.outputDirectory = appState.outputDirectoryBuffer.data();
+            }
+
+            ImGui::Spacing();
+            ImGui::TextUnformatted("Max Single File Size (KB)");
+            ImGui::SetNextItemWidth(-1.0F);
+            ImGui::InputInt("##max_single_file_kb", &appState.maxSingleFileSizeKb, 50, 250);
+            if (appState.maxSingleFileSizeKb < 1) {
+                appState.maxSingleFileSizeKb = 1;
             }
 
             ImGui::Spacing();
@@ -472,6 +705,11 @@ int main() {
                     ? ImVec4(0.34F, 0.82F, 0.46F, 1.00F)
                     : ImVec4(0.94F, 0.49F, 0.42F, 1.00F);
                 ImGui::TextColored(statusColor, "%s", appState.statusMessage.c_str());
+            }
+
+            if (appState.guiProfile == GuiProfile::AutoDetect && appState.detectedProfile.has_value()) {
+                ImGui::Spacing();
+                ImGui::TextDisabled("Detected Profile: %s", ProfileDisplayName(*appState.detectedProfile));
             }
 
             if (appState.lastRunSucceeded && appState.exportedToDisk) {
@@ -518,7 +756,7 @@ int main() {
                     ImGui::TableNextRow();
 
                     ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted(item.name.c_str());
+                    DrawIconLabel(IconForPath(fs::path(item.name)), item.name);
 
                     ImGui::TableSetColumnIndex(1);
                     ImGui::Text("%zu KB", item.content.size() / 1024U);
@@ -533,6 +771,75 @@ int main() {
                 }
 
                 ImGui::EndTable();
+            }
+
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(0.95F, 0.72F, 0.33F, 1.00F),
+                "%s  SKIPPED FILES (%zu)",
+                ICON_FA_TRIANGLE_EXCLAMATION,
+                appState.skippedItems.size());
+            ImGui::Separator();
+
+            const float skipTableHeight = ImGui::GetContentRegionAvail().y;
+            const ImGuiTableFlags skippedTableFlags =
+                ImGuiTableFlags_RowBg     |
+                ImGuiTableFlags_Borders   |
+                ImGuiTableFlags_Resizable |
+                ImGuiTableFlags_ScrollY;
+
+            if (ImGui::BeginTable("skipped_files_table", 4, skippedTableFlags, ImVec2(0.0F, skipTableHeight))) {
+                ImGui::TableSetupScrollFreeze(0, 1);
+                ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Reason", ImGuiTableColumnFlags_WidthFixed, 170.0F);
+                ImGui::TableSetupColumn("Details", ImGuiTableColumnFlags_WidthFixed, 240.0F);
+                ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 120.0F);
+                ImGui::TableHeadersRow();
+
+                bool shouldRepackage = false;
+
+                ImGuiListClipper clipper;
+                clipper.Begin(static_cast<int>(appState.skippedItems.size()));
+                while (clipper.Step()) {
+                    for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
+                        const auto& skipped = appState.skippedItems[static_cast<std::size_t>(row)];
+
+                        ImGui::TableNextRow();
+
+                        ImGui::TableSetColumnIndex(0);
+                        const std::string skippedPath = skipped.relativePath.generic_string();
+                        DrawIconLabel(IconForPath(skipped.relativePath), skippedPath);
+
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::TextUnformatted(ToDisplayReason(skipped.reason));
+
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::TextUnformatted(skipped.details.c_str());
+
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::PushID(row);
+
+                        if (skipped.reason == AIPackager::Core::SkipReason::ExcludedExtension ||
+                            skipped.reason == AIPackager::Core::SkipReason::TooLarge) {
+                            const bool alreadyIncluded = appState.manualIncludePaths.contains(NormalizePath(skipped.absolutePath));
+                            if (alreadyIncluded) {
+                                ImGui::TextUnformatted("Included");
+                            } else if (ImGui::SmallButton("Force Include")) {
+                                appState.manualIncludePaths.insert(NormalizePath(skipped.absolutePath));
+                                shouldRepackage = true;
+                            }
+                        } else {
+                            ImGui::TextUnformatted("-");
+                        }
+
+                        ImGui::PopID();
+                    }
+                }
+
+                ImGui::EndTable();
+
+                if (shouldRepackage && !appState.droppedPath.empty()) {
+                    RunPackaging(appState, fs::path(appState.droppedPath));
+                }
             }
         }
         ImGui::EndChild();

@@ -1,22 +1,3 @@
-AIPackager/
-├── CMakeLists.txt              # Ana orkestratör (Tüm projeyi ve hedefleri yönetir)
-├── core/                       # İş Mantığı (CLI ve GUI buraya bağımlıdır)
-│   ├── CMakeLists.txt          # Core için statik kütüphane (static library) üretir
-│   ├── include/core/
-│   │   ├── Packager.hpp        # 400KB'lık bölme ve birleştirme mantığı
-│   │   └── Scanner.hpp         # Dosya tarama ve filtreleme (.gitignore mantığı)
-│   └── src/
-│       ├── Packager.cpp
-│       └── Scanner.cpp
-├── cli/                        # Terminal Sürümü
-│   ├── CMakeLists.txt          # 'aipackager-cli' çalıştırılabilir dosyasını üretir
-│   └── src/main.cpp            # Sadece argümanları ayrıştırır ve Core'u çağırır
-└── gui/                        # Masaüstü Sürümü
-    ├── CMakeLists.txt          # 'aipackager-gui' çalıştırılabilir dosyasını üretir (ImGui + GLFW)
-    └── src/main.cpp            # Pencereyi çizer, sürükle-bırak eventlerini Core'a iletir
-
-
-
 Sen kıdemli bir C++ (C++20) yazılım mimarısın. Amacımız, projeleri AI asistanları için 400KB'lık metin parçalarına bölen bir aracın sadece Core (Çekirdek) kütüphanesini yazmak. Arayüz (GUI) veya CLI kodu YAZMAYACAKSIN.
 
 Kurallar ve Standartlar:

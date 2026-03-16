@@ -3,30 +3,46 @@
 Root: /run/media/yavuz/ORTAK/CODE/AI-Packager Pro
 
 ## Summary
-- Included files: 18
-- Skipped items: 1
-- Total included bytes: 118375
+- Included files: 19
+- Skipped items: 3
+- Total included bytes: 101312
+- Detected profile: C++
 
 ## Included Files (Tree-like)
-  - .github/copilot-instructions.md (2346 B)
+  - .github/.gitignore (6 B)
+  - .github/copilot-instructions.md (1213 B)
+    - .github/workflows/build.yml (2232 B)
 - CMakeLists.txt (248 B)
-  - ai_export/INDEX.txt (434 B)
-  - ai_export/SOURCE_part01.txt (56044 B)
+- LICENSE (1080 B)
+- README.md (2578 B)
   - cli/CMakeLists.txt (354 B)
     - cli/src/main.cpp (5363 B)
   - core/CMakeLists.txt (460 B)
       - core/include/core/ChunkManager.hpp (2136 B)
-      - core/include/core/IndexBuilder.hpp (1450 B)
+      - core/include/core/IndexBuilder.hpp (1492 B)
       - core/include/core/Packager.hpp (2848 B)
-      - core/include/core/Scanner.hpp (3803 B)
+      - core/include/core/Scanner.hpp (5411 B)
     - core/src/ChunkManager.cpp (2857 B)
-    - core/src/IndexBuilder.cpp (4308 B)
+    - core/src/IndexBuilder.cpp (5984 B)
     - core/src/Packager.cpp (4357 B)
-    - core/src/Scanner.cpp (12967 B)
-  - gui/CMakeLists.txt (1542 B)
-    - gui/src/main.cpp (14363 B)
-- izli_export.py (2495 B)
+    - core/src/Scanner.cpp (29718 B)
+  - gui/CMakeLists.txt (1636 B)
+    - gui/src/main.cpp (31339 B)
+
+## Large Files (Top 10)
+- gui/src/main.cpp (31339 B)
+- core/src/Scanner.cpp (29718 B)
+- core/src/IndexBuilder.cpp (5984 B)
+- core/include/core/Scanner.hpp (5411 B)
+- cli/src/main.cpp (5363 B)
+- core/src/Packager.cpp (4357 B)
+- core/src/ChunkManager.cpp (2857 B)
+- core/include/core/Packager.hpp (2848 B)
+- README.md (2578 B)
+- .github/workflows/build.yml (2232 B)
 
 ## Skipped Items
+- .git | reason=ExcludedDirectory | details=Directory excluded by scanner options
+- ai_export | reason=ExcludedDirectory | details=Directory excluded by scanner options
 - build | reason=ExcludedDirectory | details=Directory excluded by scanner options
 

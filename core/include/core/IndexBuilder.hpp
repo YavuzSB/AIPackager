@@ -12,6 +12,7 @@ namespace AIPackager::Core {
 struct IndexBuildOptions {
     bool includeSummarySection {true};
     bool includeIncludedFilesSection {true};
+    bool includeLargeFilesSection {true};
     bool includeSkippedItemsSection {true};
     bool sortEntriesLexicographically {true};
     std::string lineEnding {"\n"};

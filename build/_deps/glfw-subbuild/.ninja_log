@@ -1,0 +1,37 @@
+# ninja log v7
+1	24	1773631185890000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-mkdir	1621d18ae57a147f
+1	24	1773631185890000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-mkdir	1621d18ae57a147f
+24	4859	1773631190730000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-download	cd237566a8f6ab88
+24	4859	1773631190730000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-download	cd237566a8f6ab88
+1	26	1773635682760000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-update	1e4ef096968e5403
+1	26	1773635682760000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-update	1e4ef096968e5403
+26	57	1773635682820000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-patch	726206ca705d73c9
+26	57	1773635682820000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-patch	726206ca705d73c9
+57	85	1773635682850000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-configure	b9a5701d7c1ede5f
+57	85	1773635682850000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-configure	b9a5701d7c1ede5f
+85	117	1773635682880000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-build	25ddec63df9b9cfc
+85	117	1773635682880000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-build	25ddec63df9b9cfc
+117	145	1773635682910000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-install	62ae70ad4675333
+117	145	1773635682910000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-install	62ae70ad4675333
+145	175	1773635682940000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-test	94fbaf1cea4f0ef6
+145	175	1773635682940000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-test	94fbaf1cea4f0ef6
+175	216	1773635682980000000	CMakeFiles/glfw-populate-complete	32804ac988613fc3
+175	216	1773635682980000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-done	32804ac988613fc3
+175	216	1773635682980000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/CMakeFiles/glfw-populate-complete	32804ac988613fc3
+175	216	1773635682980000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-done	32804ac988613fc3
+1	32	1773673624640000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-update	1e4ef096968e5403
+1	32	1773673624640000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-update	1e4ef096968e5403
+32	58	1773673624700000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-patch	726206ca705d73c9
+32	58	1773673624700000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-patch	726206ca705d73c9
+58	91	1773673624730000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-configure	b9a5701d7c1ede5f
+58	91	1773673624730000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-configure	b9a5701d7c1ede5f
+91	122	1773673624760000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-build	25ddec63df9b9cfc
+91	122	1773673624760000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-build	25ddec63df9b9cfc
+122	159	1773673624800000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-install	62ae70ad4675333
+122	159	1773673624800000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-install	62ae70ad4675333
+159	194	1773673624840000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-test	94fbaf1cea4f0ef6
+159	194	1773673624840000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-test	94fbaf1cea4f0ef6
+194	242	1773673624880000000	CMakeFiles/glfw-populate-complete	32804ac988613fc3
+194	242	1773673624880000000	glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-done	32804ac988613fc3
+194	242	1773673624880000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/CMakeFiles/glfw-populate-complete	32804ac988613fc3
+194	242	1773673624880000000	/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/glfw-subbuild/glfw-populate-prefix/src/glfw-populate-stamp/glfw-populate-done	32804ac988613fc3

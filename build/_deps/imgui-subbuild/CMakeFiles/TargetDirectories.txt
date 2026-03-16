@@ -1,0 +1,3 @@
+/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/imgui-subbuild/CMakeFiles/imgui-populate.dir
+/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/imgui-subbuild/CMakeFiles/edit_cache.dir
+/run/media/yavuz/ORTAK/CODE/AI-Packager Pro/build/_deps/imgui-subbuild/CMakeFiles/rebuild_cache.dir
