@@ -22,7 +22,7 @@
 
 ## 📦 Download & Installation
 
-No installation required. Download the pre-compiled binary for your operating system from the **[Releases](https://github.com/yavuzselim/AIPackager/releases)** page.
+No installation required. Download the pre-compiled binary for your operating system from the **[Releases](https://github.com/yavuzsb/AIPackager/releases)** page.
 
 * **Windows:** `aipackager-gui-windows.exe`
 * **Linux:** `aipackager-gui-ubuntu` (Wayland & X11 compatible)
