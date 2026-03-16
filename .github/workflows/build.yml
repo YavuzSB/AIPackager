@@ -34,7 +34,11 @@ jobs:
             libxinerama-dev \
             libxcursor-dev \
             libxi-dev \
-            libgl1-mesa-dev
+            libgl1-mesa-dev \
+            libwayland-dev \
+            libxkbcommon-dev \
+            wayland-protocols \
+            libwayland-bin
 
       - name: Configure (Linux/macOS)
         if: runner.os != 'Windows'
