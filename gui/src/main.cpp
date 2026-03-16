@@ -399,59 +399,87 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::SetNextWindowPos(ImVec2(20.0F, 20.0F), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(1240.0F, 760.0F), ImGuiCond_Once);
-        ImGui::Begin("AIPackager Desktop", nullptr, ImGuiWindowFlags_NoCollapse);
+        ImGui::SetNextWindowPos(ImVec2(0.0F, 0.0F));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGui::Begin("AIPackager Pro", nullptr,
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoResize   |
+            ImGuiWindowFlags_NoMove     |
+            ImGuiWindowFlags_NoScrollbar);
 
-        if (ImGui::BeginChild("settings_panel", ImVec2(0.0F, 160.0F), true)) {
-            ImGui::Text("%s  Configuration", ICON_FA_GEAR);
+        // ── SOL SIDEBAR: Ayarlar + Durum ─────────────────────────────────
+        if (ImGui::BeginChild("sidebar", ImVec2(310.0F, 0.0F), true)) {
+            ImGui::TextColored(ImVec4(0.20F, 0.70F, 1.00F, 1.00F),
+                "%s  SYSTEM CONFIG", ICON_FA_GEAR);
             ImGui::Separator();
-            ImGui::Text("Dropped folder: %s", appState.droppedPath.empty() ? "(none)" : appState.droppedPath.c_str());
-            ImGui::Text("Chunk size limit: %zu bytes", appState.maxChunkSizeBytes);
+            ImGui::Spacing();
 
+            // Bırakılan klasör
+            const std::string displayName = appState.droppedPath.empty()
+                ? "None"
+                : fs::path(appState.droppedPath).filename().string();
+            ImGui::Text("Target: %s", displayName.c_str());
+            if (!appState.droppedPath.empty()) {
+                ImGui::TextDisabled("%s", appState.droppedPath.c_str());
+            }
+
+            ImGui::Spacing();
             ImGui::TextUnformatted("Output Directory");
             ImGui::SetNextItemWidth(-1.0F);
-            if (ImGui::InputText("##output_dir", appState.outputDirectoryBuffer.data(), appState.outputDirectoryBuffer.size())) {
+            if (ImGui::InputText("##output_dir",
+                    appState.outputDirectoryBuffer.data(),
+                    appState.outputDirectoryBuffer.size())) {
                 appState.outputDirectory = appState.outputDirectoryBuffer.data();
             }
 
+            ImGui::Spacing();
             if (!appState.droppedPath.empty()) {
-                if (ImGui::Button("Run Packaging")) {
+                if (ImGui::Button("RE-PROCESS", ImVec2(-1.0F, 36.0F))) {
                     RunPackaging(appState, fs::path(appState.droppedPath));
                 }
-                ImGui::SameLine();
-                if (ImGui::Button("Reset Output to ai_export")) {
-                    appState.outputDirectory = (fs::path(appState.droppedPath) / "ai_export").string();
+                if (ImGui::Button("Reset to ai_export", ImVec2(-1.0F, 28.0F))) {
+                    appState.outputDirectory =
+                        (fs::path(appState.droppedPath) / "ai_export").string();
                     SyncOutputDirectoryBuffer(appState);
                 }
             }
-        }
-        ImGui::EndChild();
 
-        if (ImGui::BeginChild("status_panel", ImVec2(0.0F, 170.0F), true)) {
-            ImGui::Text("%s  Drop Zone / Status", ICON_FA_DOWNLOAD);
+            ImGui::Spacing();
             ImGui::Separator();
+            ImGui::Spacing();
 
-            ImGui::Dummy(ImVec2(0.0F, 4.0F));
+            // Drop Zone
+            ImGui::TextColored(ImVec4(0.20F, 0.70F, 1.00F, 1.00F),
+                "%s  DROP ZONE", ICON_FA_DOWNLOAD);
+            ImGui::Separator();
+            ImGui::Spacing();
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.39F, 0.80F, 1.00F, 1.00F));
-            ImGui::SetWindowFontScale(1.55F);
+            ImGui::SetWindowFontScale(1.80F);
             ImGui::TextUnformatted(ICON_FA_BOX_ARCHIVE);
-            ImGui::SetWindowFontScale(1.0F);
+            ImGui::SetWindowFontScale(1.00F);
             ImGui::PopStyleColor();
-            ImGui::TextUnformatted("Drag and drop a project folder here to start packaging instantly.");
+            ImGui::TextWrapped("Drag & drop a project folder here to start packaging instantly.");
 
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            // Durum mesajı
             if (appState.isProcessing) {
-                ImGui::TextColored(ImVec4(0.46F, 0.75F, 1.00F, 1.00F), "Status: Processing...");
+                ImGui::TextColored(ImVec4(0.46F, 0.75F, 1.00F, 1.00F), "Processing...");
             } else {
                 const ImVec4 statusColor = appState.lastRunSucceeded
                     ? ImVec4(0.34F, 0.82F, 0.46F, 1.00F)
                     : ImVec4(0.94F, 0.49F, 0.42F, 1.00F);
-                ImGui::TextColored(statusColor, "Status: %s", appState.statusMessage.c_str());
+                ImGui::TextColored(statusColor, "%s", appState.statusMessage.c_str());
             }
 
             if (appState.lastRunSucceeded && appState.exportedToDisk) {
-                ImGui::Text("Export folder: %s", appState.outputDirectory.c_str());
-                if (ImGui::Button((std::string(ICON_FA_FOLDER_OPEN) + " Open Export Folder").c_str())) {
+                ImGui::Spacing();
+                ImGui::TextWrapped("Export: %s", appState.outputDirectory.c_str());
+                if (ImGui::Button(
+                        (std::string(ICON_FA_FOLDER_OPEN) + " Open Export Folder").c_str(),
+                        ImVec2(-1.0F, 32.0F))) {
                     std::string openError;
                     if (!OpenInFileManager(fs::path(appState.outputDirectory), openError)) {
                         appState.statusMessage = "Error: " + openError;
@@ -462,38 +490,50 @@ int main() {
         }
         ImGui::EndChild();
 
-        if (ImGui::BeginChild("files_panel", ImVec2(0.0F, 0.0F), true)) {
-            ImGui::Text("%s  Generated Files (%zu)", ICON_FA_CIRCLE_CHECK, appState.generatedItems.size());
+        ImGui::SameLine();
+
+        // ── SAĞ PANEL: Üretilen dosyalar ─────────────────────────────────
+        if (ImGui::BeginChild("main_view", ImVec2(0.0F, 0.0F), false)) {
+            ImGui::TextColored(ImVec4(0.20F, 0.70F, 1.00F, 1.00F),
+                "%s  GENERATED CHUNKS (%zu)",
+                ICON_FA_CIRCLE_CHECK,
+                appState.generatedItems.size());
             ImGui::Separator();
 
-            if (ImGui::BeginTable("generated_table", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY, ImVec2(0.0F, 0.0F))) {
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch, 0.45F);
-            ImGui::TableSetupColumn("Size (bytes)", ImGuiTableColumnFlags_WidthStretch, 0.20F);
-            ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthStretch, 0.35F);
-            ImGui::TableHeadersRow();
+            const ImGuiTableFlags tableFlags =
+                ImGuiTableFlags_RowBg        |
+                ImGuiTableFlags_Borders      |
+                ImGuiTableFlags_Resizable    |
+                ImGuiTableFlags_ScrollY;
 
-            for (std::size_t i = 0; i < appState.generatedItems.size(); ++i) {
-                const ClipboardItem& item = appState.generatedItems[i];
+            if (ImGui::BeginTable("files_table", 3, tableFlags)) {
+                ImGui::TableSetupScrollFreeze(0, 1);
+                ImGui::TableSetupColumn("Part Name", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Size",      ImGuiTableColumnFlags_WidthFixed, 90.0F);
+                ImGui::TableSetupColumn("Action",    ImGuiTableColumnFlags_WidthFixed, 110.0F);
+                ImGui::TableHeadersRow();
 
-                ImGui::TableNextRow();
+                for (std::size_t i = 0; i < appState.generatedItems.size(); ++i) {
+                    const ClipboardItem& item = appState.generatedItems[i];
+                    ImGui::TableNextRow();
 
-                ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted(item.name.c_str());
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::TextUnformatted(item.name.c_str());
 
-                ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%zu", item.content.size());
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("%zu KB", item.content.size() / 1024U);
 
-                ImGui::TableSetColumnIndex(2);
-                ImGui::PushID(static_cast<int>(i));
-                ImGui::SetNextItemWidth(100.0F);
-                if (ImGui::SmallButton((std::string(ICON_FA_COPY) + " Copy").c_str())) {
-                    ImGui::SetClipboardText(item.content.c_str());
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::PushID(static_cast<int>(i));
+                    if (ImGui::SmallButton(
+                            (std::string(ICON_FA_COPY) + " Copy##" + item.name).c_str())) {
+                        ImGui::SetClipboardText(item.content.c_str());
+                    }
+                    ImGui::PopID();
                 }
-                ImGui::PopID();
-            }
 
-            ImGui::EndTable();
-        }
+                ImGui::EndTable();
+            }
         }
         ImGui::EndChild();
 
